@@ -18,6 +18,8 @@ namespace Game
 
             var board = new Board(w, h, mines);
             board.DisplayBoard();
+            board.ChangeState(1, 2, Board.TileState.Flagged); // Flag tile
+            board.ChangeState(1, 2, Board.TileState.Uncovered); // Uncover tile
             
             return 0;
         }
@@ -25,6 +27,14 @@ namespace Game
 
     class Board
     {
+        public enum TileState
+        {
+            Unknown,
+            Uncovered,
+            Flagged,
+            Exploded
+        }
+
         const char FLAG = '⚐';
         const char TILE = '◩';
         public readonly int w, h;
@@ -54,6 +64,10 @@ namespace Game
             }
         }
 
-        
+        // Changes the tile's state to the specified state code
+        public void ChangeState(int row, int column, TileState state)
+        {
+            this.boardStates[this.w * row + column] = (int) state;
+        }    
     }
 }
