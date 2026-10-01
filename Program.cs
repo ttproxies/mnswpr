@@ -56,7 +56,7 @@ namespace Game
         // Distibutes mines across the board and sets boardMines accordingly
         private void GenerateMines(int clickRow, int clickColumn)
         {
-            Random rand = new Random();
+            Random rand = new();
             int[] pickedIndices = new int[this.mines - 1];
             int curIndex;
             for (int i = 0; i < this.mines; i++)
@@ -72,7 +72,21 @@ namespace Game
 
         private int MinesInProximity(int row, int column)
         {
-            return 2;
+            int mines = 0;
+            int curInd;
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    curInd = row+row*i + column+j;
+                    if (curInd >= 0 && this.boardMines[curInd])
+                    {
+                        mines++;
+                    }
+                }
+            }
+
+            return mines;
         }
 
         private void Cascade(int row, int column)
