@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using System.Globalization;
 
 namespace Game
 {
@@ -36,30 +37,47 @@ namespace Game
             Exploded
         }
 
-        public readonly int w, h;
+        public readonly int w, h, mines;
         private TileState[] boardStates;
-        private TileState[] boardMines;
+        private bool[] boardMines;
 
         public Board(int w, int h, int mines)
         {
             this.w = w;
             this.h = h;
+            this.mines = mines;
             this.boardStates = new TileState[w*h];
-            this.boardMines = new TileState[w*h];
+            this.boardMines = new bool[w*h];
 
             Array.Fill(boardStates, TileState.Unknown);
-            Array.Fill(boardMines, TileState.Unknown);
+            Array.Fill(boardMines, false);
         }
 
-        // Distibutes mines across the board 
+        // Distibutes mines across the board and sets boardMines accordingly
         private void GenerateMines(int clickRow, int clickColumn)
         {
-            
+            Random rand = new Random();
+            int[] pickedIndices = new int[this.mines - 1];
+            int curIndex;
+            for (int i = 0; i < this.mines; i++)
+            {
+                do
+                {
+                    curIndex = rand.Next(this.w * this.h);
+                }
+                while (!pickedIndices.Contains(curIndex));
+                this.boardMines[curIndex] = true;
+            }
         }
 
         private int MinesInProximity(int row, int column)
         {
             return 2;
+        }
+
+        private void Cascade(int row, int column)
+        {
+            
         }
 
         // Displays the current state of the board
@@ -79,7 +97,7 @@ namespace Game
 
                         case TileState.Uncovered:
                             neighboringMines = MinesInProximity(i, j);
-                            Console.Write(neighboringMines > 0 ? neighboringMines : "⚬ "); // Mine proximity logic to be added
+                            Console.Write(neighboringMines > 0 ? neighboringMines + " " : "⚬ "); // Mine proximity logic to be added
                             break;
 
                         case TileState.Flagged:
