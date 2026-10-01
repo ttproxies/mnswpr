@@ -25,12 +25,21 @@ namespace Game
 
     class Board
     {
-        public int w, h, mines;
+        const char FLAG = '⚐';
+        const char TILE = '◩';
+        public readonly int w, h;
+        private int[] boardStates;
+        private int[] boardMines;
+
         public Board(int w, int h, int mines)
         {
             this.w = w;
             this.h = h;
-            this.mines = mines;
+            this.boardStates = new int[w*h];
+            this.boardMines = new int[w*h];
+
+            Array.Fill(boardStates, 0);
+            Array.Fill(boardMines, 0);
         }
 
         public void DisplayBoard()
@@ -39,10 +48,12 @@ namespace Game
             {
                 for (int j = 0; j < this.w; j++)
                 {
-                    Console.Write("# ");
+                    Console.Write(TILE + " ");
                 }
                 Console.WriteLine();
             }
         }
+
+        
     }
 }
