@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 
 namespace Game
 {
@@ -17,9 +18,9 @@ namespace Game
             int mines =  int.Parse(args[2]); 
 
             var board = new Board(w, h, mines);
-            board.DisplayBoard();
             board.ChangeState(1, 2, Board.TileState.Flagged); // Flag tile
-            board.ChangeState(1, 2, Board.TileState.Uncovered); // Uncover tile
+            board.ChangeState(7, 5, Board.TileState.Uncovered); // Uncover tile
+            board.DisplayBoard();
             
             return 0;
         }
@@ -35,30 +36,60 @@ namespace Game
             Exploded
         }
 
-        const char FLAG = '⚐';
-        const char TILE = '◩';
         public readonly int w, h;
-        private int[] boardStates;
-        private int[] boardMines;
+        private TileState[] boardStates;
+        private TileState[] boardMines;
 
         public Board(int w, int h, int mines)
         {
             this.w = w;
             this.h = h;
-            this.boardStates = new int[w*h];
-            this.boardMines = new int[w*h];
+            this.boardStates = new TileState[w*h];
+            this.boardMines = new TileState[w*h];
 
-            Array.Fill(boardStates, 0);
-            Array.Fill(boardMines, 0);
+            Array.Fill(boardStates, TileState.Unknown);
+            Array.Fill(boardMines, TileState.Unknown);
         }
 
+        // Distibutes mines across the board 
+        private void GenerateMines(int clickRow, int clickColumn)
+        {
+            
+        }
+
+        private int MinesInProximity(int row, int column)
+        {
+            return 2;
+        }
+
+        // Displays the current state of the board
         public void DisplayBoard()
         {
+            int neighboringMines;
             for (int i = 0; i < this.h; i++)
             {
                 for (int j = 0; j < this.w; j++)
                 {
-                    Console.Write(TILE + " ");
+                    
+                    switch (this.boardStates[i*w + j])
+                    {
+                        case TileState.Unknown:
+                            Console.Write("◩ ");
+                            break;
+
+                        case TileState.Uncovered:
+                            neighboringMines = MinesInProximity(i, j);
+                            Console.Write(neighboringMines > 0 ? neighboringMines : "⚬ "); // Mine proximity logic to be added
+                            break;
+
+                        case TileState.Flagged:
+                            Console.Write("⚐ ");
+                            break;
+
+                        case TileState.Exploded:
+                            Console.Write("✴︎ ");
+                            break;
+                    }
                 }
                 Console.WriteLine();
             }
@@ -67,7 +98,7 @@ namespace Game
         // Changes the tile's state to the specified state code
         public void ChangeState(int row, int column, TileState state)
         {
-            this.boardStates[this.w * row + column] = (int) state;
+            this.boardStates[this.w * row + column] = state;
         }    
     }
 }
