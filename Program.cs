@@ -20,11 +20,42 @@ namespace Game
             int mines = int.Parse(args[2]);
 
             var board = new Board(w, h, mines);
-            board.ChangeState(1, 2, Board.TileState.Flagged); // Flag tile
-            board.ChangeState(7, 5, Board.TileState.Uncovered); // Uncover tile
-            board.DisplayBoard();
+            bool playing = true;
+
+            // Main game loop
+            while (playing)
+            {
+                Console.Write("Action:\n> ");
+                string inputAction;
+                do
+                {
+                    inputAction = Console.ReadLine();
+                }
+                while (!IsActionValid(inputAction));
+
+                string[] actionArgs = inputAction.Split();
+                char actType = Convert.ToChar(actionArgs[0]);
+                int actRow = Convert.ToInt32(actionArgs[1]);
+                int actCol = Convert.ToInt32(actionArgs[2]);
+
+                switch (actType)
+                {
+                    case 'U':
+
+                        break;
+                    
+                    case 'F':
+                        // TODO: figure out logic for deciding whether tile can be flagged
+                        break;
+                }
+            }
 
             return 0;
+        }
+
+        private static bool IsActionValid(string actionStr)
+        {
+            return true;
         }
     }
 
@@ -39,7 +70,7 @@ namespace Game
         }
 
         public readonly int w, h, mines;
-        private TileState[] boardStates;
+        public TileState[] boardStates;
         private bool[] boardMines;
 
         public Board(int w, int h, int mines)
@@ -94,16 +125,16 @@ namespace Game
         // FLood tile uncovery
         private void Flood(int row, int col, List<int> visited, Queue<int> queue)
         {
-            int ind = this.w*row+col;
+            int ind = this.w * row + col;
             visited.Add(ind);
 
             if (this.boardStates[ind] != TileState.Flagged)
             {
                 return;
             }
-         
-            ChangeState(row, col, TileState.Uncovered);    
-            
+
+            ChangeState(row, col, TileState.Uncovered);
+
             // Edge case for root vertex
             if (queue.Count == 0)
             {
@@ -118,7 +149,7 @@ namespace Game
                 {
                     for (int j = -1; j <= 1; j++)
                     {
-                        adjInd = ind + this.w*i + j;
+                        adjInd = ind + this.w * i + j;
                         if (!visited.Contains(adjInd))
                         {
                             queue.Enqueue(adjInd);
