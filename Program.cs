@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 
 namespace Game
@@ -16,13 +17,13 @@ namespace Game
 
             int w = int.Parse(args[0]);
             int h = int.Parse(args[1]);
-            int mines =  int.Parse(args[2]); 
+            int mines = int.Parse(args[2]);
 
             var board = new Board(w, h, mines);
             board.ChangeState(1, 2, Board.TileState.Flagged); // Flag tile
             board.ChangeState(7, 5, Board.TileState.Uncovered); // Uncover tile
             board.DisplayBoard();
-            
+
             return 0;
         }
     }
@@ -46,8 +47,8 @@ namespace Game
             this.w = w;
             this.h = h;
             this.mines = mines;
-            this.boardStates = new TileState[w*h];
-            this.boardMines = new bool[w*h];
+            this.boardStates = new TileState[w * h];
+            this.boardMines = new bool[w * h];
 
             Array.Fill(boardStates, TileState.Unknown);
             Array.Fill(boardMines, false);
@@ -70,6 +71,7 @@ namespace Game
             }
         }
 
+        // Returns number of neighboring mines
         private int MinesInProximity(int row, int column)
         {
             int mines = 0;
@@ -78,7 +80,7 @@ namespace Game
             {
                 for (int j = -1; j <= 1; j++)
                 {
-                    curInd = row+row*i + column+j;
+                    curInd = row + this.w * i + column + j;
                     if (curInd >= 0 && this.boardMines[curInd])
                     {
                         mines++;
@@ -89,9 +91,43 @@ namespace Game
             return mines;
         }
 
-        private void Cascade(int row, int column)
+        // FLood tile uncovery
+        private void Flood(int row, int col, List<int> visited, Queue<int> queue)
         {
+            int ind = this.w*row+col;
+            visited.Add(ind);
+
+            if (this.boardStates[ind] != TileState.Flagged)
+            {
+                return;
+            }
+         
+            ChangeState(row, col, TileState.Uncovered);    
             
+            // Edge case for root vertex
+            if (queue.Count == 0)
+            {
+                queue.Enqueue(ind);
+                Flood(row, col, visited, queue);
+            }
+
+            if (MinesInProximity(row, col) == 0)
+            {
+                int adjInd;
+                for (int i = -1; i <= 1; i++)
+                {
+                    for (int j = -1; j <= 1; j++)
+                    {
+                        adjInd = ind + this.w*i + j;
+                        if (!visited.Contains(adjInd))
+                        {
+                            queue.Enqueue(adjInd);
+                        }
+                    }
+                }
+            }
+
+
         }
 
         // Displays the current state of the board
@@ -102,8 +138,8 @@ namespace Game
             {
                 for (int j = 0; j < this.w; j++)
                 {
-                    
-                    switch (this.boardStates[i*w + j])
+
+                    switch (this.boardStates[i * w + j])
                     {
                         case TileState.Unknown:
                             Console.Write("◩ ");
@@ -131,6 +167,6 @@ namespace Game
         public void ChangeState(int row, int column, TileState state)
         {
             this.boardStates[this.w * row + column] = state;
-        }    
+        }
     }
 }
