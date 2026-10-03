@@ -37,13 +37,14 @@ namespace Game
                 char actType = Convert.ToChar(actionArgs[0]);
                 int actRow = Convert.ToInt32(actionArgs[1]);
                 int actCol = Convert.ToInt32(actionArgs[2]);
+                int actInd = actRow * board.w + actCol;
 
                 switch (actType)
                 {
                     case 'U':
-                        if (board.boardStates[actRow*board.w+actCol] == Board.TileState.Unknown)
+                        if (board.boardStates[actInd] == Board.TileState.Unknown)
                         {
-                            // TODO: write initial tile uncovery thing    
+                            if (board.boardMines[actInd])
                         }
 
                         break;
@@ -204,17 +205,22 @@ namespace Game
             this.boardStates[this.w * row + column] = state;
         }
 
+        public TileState GetTileState(int row, int column)
+        {
+            return this.boardStates[this.w * row + column];
+        }
+
         public void ToggleFlag(int row, int column)
         {
             // Maybe try to make this more elegant...
-            if (this.boardStates[row * this.w + column] == Board.TileState.Unknown)
+            if (GetTileState(row, column) == TileState.Unknown)
             {
-                this.boardStates[row * this.w + column] = Board.TileState.Flagged;
+                ChangeState(row, column, TileState.Flagged);
             }
 
-            if (this.boardStates[row * this.w + column] == Board.TileState.Flagged)
+            if (GetTileState(row, column) == TileState.Flagged)
             {
-                this.boardStates[row * this.w + column] = Board.TileState.Unknown;
+                ChangeState(row, column, TileState.Unknown);
             }
         }
     }
