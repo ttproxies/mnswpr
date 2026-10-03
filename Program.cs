@@ -41,11 +41,15 @@ namespace Game
                 switch (actType)
                 {
                     case 'U':
+                        if (board.boardStates[actRow*board.w+actCol] == Board.TileState.Unknown)
+                        {
+                            // TODO: write initial tile uncovery thing    
+                        }
 
                         break;
-                    
+
                     case 'F':
-                        // TODO: figure out logic for deciding whether tile can be flagged
+                        board.ToggleFlag(actRow, actCol);
                         break;
                 }
             }
@@ -198,6 +202,20 @@ namespace Game
         public void ChangeState(int row, int column, TileState state)
         {
             this.boardStates[this.w * row + column] = state;
+        }
+
+        public void ToggleFlag(int row, int column)
+        {
+            // Maybe try to make this more elegant...
+            if (this.boardStates[row * this.w + column] == Board.TileState.Unknown)
+            {
+                this.boardStates[row * this.w + column] = Board.TileState.Flagged;
+            }
+
+            if (this.boardStates[row * this.w + column] == Board.TileState.Flagged)
+            {
+                this.boardStates[row * this.w + column] = Board.TileState.Unknown;
+            }
         }
     }
 }
