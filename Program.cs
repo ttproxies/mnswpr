@@ -22,18 +22,17 @@ namespace Game
             var board = new Board(w, h, mines);
             bool playing = true;
 
+            // Start round
+            board.DisplayBoard();
+            string inputAction = GetActionInput();
+
+
             // Main game loop
             while (playing)
             {
                 board.DisplayBoard();
-                
-                Console.Write("Action:\n> ");
-                string inputAction;
-                do
-                {
-                    inputAction = Console.ReadLine();
-                }
-                while (!IsActionValid(inputAction));
+
+                inputAction = GetActionInput();
 
                 string[] actionArgs = inputAction.Split();
                 char actType = Convert.ToChar(actionArgs[0]);
@@ -52,6 +51,10 @@ namespace Game
                                 Console.WriteLine("Oops! You've exploded!");
                                 playing = false;
                             }
+                            else
+                            {
+                                board.Reveal(actRow, actCol);
+                            }
                         }
 
                         break;
@@ -59,13 +62,29 @@ namespace Game
                     case 'F':
                         board.ToggleFlag(actRow, actCol);
                         break;
+
+                    default:
+                        break;
                 }
             }
 
             return 0;
         }
 
-        private static bool IsActionValid(string actionStr)
+        private static string? GetActionInput()
+        {
+            Console.Write("\nAction:\n> ");
+            string? inputAction;
+            do
+            {
+                inputAction = Console.ReadLine();
+            }
+            while (!IsActionValid(inputAction));
+
+            return inputAction;
+        }
+
+        private static bool IsActionValid(string? actionStr)
         {
             return true;
         }
@@ -102,6 +121,8 @@ namespace Game
         {
             Random rand = new();
             int[] pickedIndices = new int[this.mines - 1];
+            pickedIndices[0] = clickRow * this.w + clickColumn;
+
             int curIndex;
             for (int i = 0; i < this.mines; i++)
             {
@@ -124,36 +145,36 @@ namespace Game
                 for (int j = -1; j <= 1; j++)
                 {
                     curInd = row + this.w * i + column + j;
-                    if (curInd >= 0 && this.boardMines[curInd])
+                    if (curInd >= 0 && curInd < this.w * this.h && this.boardMines[curInd])
                     {
                         mines++;
                     }
                 }
             }
 
+            Console.Write(mines);
             return mines;
         }
 
-        // FLood tile uncovery
+        // Reveals tile and performs flood filling
+        public void Reveal(int row, int col)
+        {
+            Flood(row, col, [], []);
+        }
+
+        // Reveal all neighboring blank tiles recursively
         private void Flood(int row, int col, List<int> visited, Queue<int> queue)
         {
+            // Mark current index as visited and uncover tile
             int ind = this.w * row + col;
+            Console.WriteLine("Current flood tile: " + ind);
             visited.Add(ind);
-
-            if (this.boardStates[ind] != TileState.Flagged)
+            if (GetTileState(row, col) != TileState.Flagged)
             {
-                return;
+                SetTileState(row, col, TileState.Uncovered);
             }
 
-            ChangeState(row, col, TileState.Uncovered);
-
-            // Edge case for root vertex
-            if (queue.Count == 0)
-            {
-                queue.Enqueue(ind);
-                Flood(row, col, visited, queue);
-            }
-
+            // Add neighbors to queue if not an edge tile
             if (MinesInProximity(row, col) == 0)
             {
                 int adjInd;
@@ -162,13 +183,21 @@ namespace Game
                     for (int j = -1; j <= 1; j++)
                     {
                         adjInd = ind + this.w * i + j;
-                        if (!visited.Contains(adjInd))
+                        if (!visited.Contains(adjInd) && !queue.Contains(adjInd) && isValidAdj(adjInd, ind, i, j))
                         {
                             queue.Enqueue(adjInd);
                         }
                     }
                 }
             }
+
+            if (queue.Count == 0)
+            {
+                return;
+            }
+
+            int nextInd = queue.Dequeue();
+            Flood((int)(nextInd / this.w), nextInd % this.w, visited, queue);
         }
 
         // Displays the current state of the board
@@ -205,6 +234,24 @@ namespace Game
             }
         }
 
+        // Returns whether an index is in range relative to original index
+        private bool isValidAdj(int adjInd, int relInd, int i, int j)
+        {
+            // Trivial bounds checking
+            if (adjInd < 0 || adjInd >= this.w * this.h)
+            {
+                return false;
+            }
+
+            // Some form of wrapping must be occurring
+            if (adjInd % this.w != relInd % this.w + j || (int)(adjInd / this.w) != (int)(relInd / this.w) + i)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         // Sets all tiles with a mine to TileState.Exploded
         public void ExplodeMines()
         {
@@ -212,7 +259,7 @@ namespace Game
         }
 
         // Changes the tile's state to the specified state code
-        public void ChangeState(int row, int column, TileState state)
+        public void SetTileState(int row, int column, TileState state)
         {
             this.boardStates[this.w * row + column] = state;
         }
@@ -220,6 +267,7 @@ namespace Game
         // Returns the TileState value of a board tile
         public TileState GetTileState(int row, int column)
         {
+            Console.WriteLine($"{row}, {column}, {this.w * row + column}");
             return this.boardStates[this.w * row + column];
         }
 
@@ -235,12 +283,12 @@ namespace Game
             // Maybe try to make this more elegant...
             if (GetTileState(row, column) == TileState.Unknown)
             {
-                ChangeState(row, column, TileState.Flagged);
+                SetTileState(row, column, TileState.Flagged);
             }
 
             if (GetTileState(row, column) == TileState.Flagged)
             {
-                ChangeState(row, column, TileState.Unknown);
+                SetTileState(row, column, TileState.Unknown);
             }
         }
     }
