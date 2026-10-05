@@ -71,7 +71,7 @@ namespace Game
             return 0;
         }
 
-        private static string? GetActionInput()
+        private static (char, int, int) GetAction()
         {
             Console.Write("\nAction:\n> ");
             string? inputAction;
@@ -80,13 +80,12 @@ namespace Game
                 inputAction = Console.ReadLine();
             }
             while (!IsActionValid(inputAction));
-
-            return inputAction;
         }
 
-        private static bool IsActionValid(string? actionStr)
+        private static bool IsActionValid(string actionStr, int boardWidth, int boardHeight)
         {
-            return true;
+            string pattern = $"[UF] [0]";
+            if (actionStr )
         }
     }
 
