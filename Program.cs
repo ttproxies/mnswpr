@@ -25,6 +25,8 @@ namespace Game
             // Main game loop
             while (playing)
             {
+                board.DisplayBoard();
+                
                 Console.Write("Action:\n> ");
                 string inputAction;
                 do
@@ -42,9 +44,14 @@ namespace Game
                 switch (actType)
                 {
                     case 'U':
-                        if (board.boardStates[actInd] == Board.TileState.Unknown)
+                        if (board.GetTileState(actRow, actCol) == Board.TileState.Unknown)
                         {
-                            if (board.boardMines[actInd])
+                            if (board.IsMine(actRow, actCol))
+                            {
+                                board.ExplodeMines();
+                                Console.WriteLine("Oops! You've exploded!");
+                                playing = false;
+                            }
                         }
 
                         break;
@@ -75,7 +82,7 @@ namespace Game
         }
 
         public readonly int w, h, mines;
-        public TileState[] boardStates;
+        private TileState[] boardStates;
         private bool[] boardMines;
 
         public Board(int w, int h, int mines)
@@ -162,19 +169,18 @@ namespace Game
                     }
                 }
             }
-
-
         }
 
         // Displays the current state of the board
         public void DisplayBoard()
         {
+            Console.WriteLine("\x1b[3J");
+            Console.Clear();
             int neighboringMines;
             for (int i = 0; i < this.h; i++)
             {
                 for (int j = 0; j < this.w; j++)
                 {
-
                     switch (this.boardStates[i * w + j])
                     {
                         case TileState.Unknown:
@@ -199,17 +205,31 @@ namespace Game
             }
         }
 
+        // Sets all tiles with a mine to TileState.Exploded
+        public void ExplodeMines()
+        {
+            return;
+        }
+
         // Changes the tile's state to the specified state code
         public void ChangeState(int row, int column, TileState state)
         {
             this.boardStates[this.w * row + column] = state;
         }
 
+        // Returns the TileState value of a board tile
         public TileState GetTileState(int row, int column)
         {
             return this.boardStates[this.w * row + column];
         }
 
+        // Returns whether tile has a mine or not
+        public bool IsMine(int row, int column)
+        {
+            return this.boardMines[this.w * row + column];
+        }
+
+        // Toggles a tile between flagged and unknown state
         public void ToggleFlag(int row, int column)
         {
             // Maybe try to make this more elegant...
