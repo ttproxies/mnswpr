@@ -84,8 +84,14 @@ namespace Game
 
         private static bool IsActionValid(string actionStr, int boardWidth, int boardHeight)
         {
-            string pattern = $"[UF] [0]";
-            if (actionStr )
+            string[] actionParams = actionStr.Split();
+            if (actionStr.Split().Length != 3)
+            {
+                return false;
+            }
+
+            char actionType = Convert.ToChar(actionParams[0]);
+            int[] actionCoords = {Convert.ToInt32(actionParams[1]), Convert.ToInt32(actionParams[2])};
         }
     }
 
@@ -242,7 +248,7 @@ namespace Game
                 return false;
             }
 
-            // Some form of wrapping must be occurring
+            // Evil wizardry (check for wrapping)
             if (adjInd % this.w != relInd % this.w + j || (int)(adjInd / this.w) != (int)(relInd / this.w) + i)
             {
                 return false;
