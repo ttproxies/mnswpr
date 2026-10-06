@@ -182,7 +182,7 @@ namespace Game
                     for (int j = -1; j <= 1; j++)
                     {
                         adjInd = ind + this.w * i + j;
-                        if (!visited.Contains(adjInd) && !queue.Contains(adjInd) && isValidAdj(adjInd, ind, i, j))
+                        if (!visited.Contains(adjInd) && !queue.Contains(adjInd) && IsValidAdj(adjInd, ind, i, j))
                         {
                             queue.Enqueue(adjInd);
                         }
@@ -234,7 +234,7 @@ namespace Game
         }
 
         // Returns whether an index is in range relative to original index
-        private bool isValidAdj(int adjInd, int relInd, int i, int j)
+        private bool IsValidAdj(int adjInd, int relInd, int i, int j)
         {
             // Trivial bounds checking
             if (adjInd < 0 || adjInd >= this.w * this.h)
@@ -254,6 +254,16 @@ namespace Game
         // Sets all tiles with a mine to TileState.Exploded
         public void ExplodeMines()
         {
+            for (int i = 0; i < this.h; i++)
+            {
+                for (int j = 0; j < this.w; j++)
+                {
+                    if (IsMine(i, j))
+                    {
+                        SetTileState(i, j, TileState.Exploded);
+                    }
+                }
+            }
             return;
         }
 
