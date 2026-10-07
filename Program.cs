@@ -17,6 +17,8 @@ namespace Game
                 return 1;
             }
 
+            const string allowedActions = "UF";
+
             int w = int.Parse(args[0]);
             int h = int.Parse(args[1]);
             int mines = int.Parse(args[2]);
@@ -24,64 +26,68 @@ namespace Game
             var board = new Board(w, h, mines);
             bool playing = true;
 
-            // Start round
-            board.DisplayBoard();
-            var (actType, actCol, actRow) = GetAction(board.w, board.h);
-
             // Main game loop
             while (playing)
             {
                 board.DisplayBoard();
 
-                (actType, actCol, actRow) = GetAction(board.w, board.h);
-
+                var (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
                 int actInd = actRow * board.w + actCol;
 
-                switch (actType)
-                {
-                    case 'U':
-                        if (board.GetTileState(actRow, actCol) == Board.TileState.Unknown)
-                        {
-                            if (board.IsMine(actRow, actCol))
-                            {
-                                board.ExplodeMines();
-                                Console.WriteLine("Oops! You've exploded!");
-                                playing = false;
-                            }
-                            else
-                            {
-                                board.Reveal(actRow, actCol);
-                            }
-                        }
-
-                        break;
-
-                    case 'F':
-                        board.ToggleFlag(actRow, actCol);
-                        break;
-                }
+                playing = HandleAction(actType, actCol, actRow, board);
             }
 
             return 0;
         }
 
+        // Handles action side-effects and returns whether game can continue
+        private static bool HandleAction(int actType, int actCol, int actRow, Board board)
+        {
+            switch (actType)
+            {
+                case 'U':
+                    if (board.GetTileState(actRow, actCol) == Board.TileState.Unknown)
+                    {
+                        if (board.IsMine(actRow, actCol))
+                        {
+                            board.ExplodeMines();
+                            Console.WriteLine("Oops! You've exploded!");
+                            return false;
+                        }
+                        else
+                        {
+                            board.Flood(actRow, actCol);
+                        }
+                    }
+
+                    break;
+
+                case 'F':
+                    board.ToggleFlag(actRow, actCol);
+                    break;
+            }
+            return true;
+        }
+
         // Prompts the player to input an action
-        private static (char, int, int) GetAction(int boardWidth, int boardHeight)
+        private static (char, int, int) GetAction(int boardWidth, int boardHeight, string allowedActions)
         {
             Console.Write("\nAction:\n> ");
-            string? inputAction;
-            do
+            string? inputAction = Console.ReadLine();
+
+            while (string.IsNullOrEmpty(inputAction) || !IsActionValid(inputAction, boardWidth, boardHeight, allowedActions))
             {
+                Console.Write("\nInvalid input, please try again:\n> ");
                 inputAction = Console.ReadLine();
             }
-            while (string.IsNullOrWhiteSpace(inputAction) || !IsActionValid(inputAction, boardWidth, boardHeight));
+
             string[] inputParams = inputAction.Split();
 
             return (Convert.ToChar(inputParams[0]), Convert.ToInt32(inputParams[1]), Convert.ToInt32(inputParams[2]));
         }
 
         // Do the dirty work of validating user input
-        private static bool IsActionValid(string actionStr, int boardWidth, int boardHeight)
+        private static bool IsActionValid(string actionStr, int boardWidth, int boardHeight, string allowedActions)
         {
             string[] actionParams = actionStr.Trim().Split();
             if (actionStr.Split().Length != 3)
@@ -96,6 +102,11 @@ namespace Game
 
             char actionType = Convert.ToChar(actionParams[0]);
             int[] actionCoords = [Convert.ToInt32(actionParams[1]), Convert.ToInt32(actionParams[2])];
+
+            if (!allowedActions.Contains(actionType))
+            {
+                return false;
+            }
 
             if (actionCoords[0] < 0 || actionCoords[0] >= boardWidth)
             {
@@ -173,22 +184,17 @@ namespace Game
                 }
             }
 
-            Console.Write(mines);
             return mines;
         }
 
-        // Reveals tile and performs flood filling
-        public void Reveal(int row, int col)
-        {
-            Flood(row, col, [], []);
-        }
-
         // Reveal all neighboring blank tiles recursively
-        private void Flood(int row, int col, List<int> visited, Queue<int> queue)
+        public void Flood(int row, int col, List<int>? visited = null, Queue<int>? queue = null)
         {
+            visited ??= [];
+            queue ??= [];
+
             // Mark current index as visited and uncover tile
             int ind = this.w * row + col;
-            Console.WriteLine("Current flood tile: " + ind);
             visited.Add(ind);
             if (GetTileState(row, col) != TileState.Flagged)
             {
@@ -239,7 +245,7 @@ namespace Game
 
                         case TileState.Uncovered:
                             neighboringMines = MinesInProximity(i, j);
-                            Console.Write(neighboringMines > 0 ? neighboringMines + " " : "⚬ "); // Mine proximity logic to be added
+                            Console.Write(neighboringMines > 0 ? neighboringMines + " " : "⚬ ");
                             break;
 
                         case TileState.Flagged:
@@ -298,7 +304,7 @@ namespace Game
         // Returns the TileState value of a board tile
         public TileState GetTileState(int row, int column)
         {
-            Console.WriteLine($"{row}, {column}, {this.w * row + column}");
+            // Console.WriteLine($"{row}, {column}, {this.w * row + column}");
             return this.boardStates[this.w * row + column];
         }
 
