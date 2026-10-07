@@ -1,7 +1,9 @@
 ﻿using System;
 using System.CodeDom.Compiler;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using System.Globalization;
+using System.Security.AccessControl;
 
 namespace Game
 {
@@ -24,20 +26,15 @@ namespace Game
 
             // Start round
             board.DisplayBoard();
-            string inputAction = GetActionInput();
-
+            var (actType, actCol, actRow) = GetAction(board.w, board.h);
 
             // Main game loop
             while (playing)
             {
                 board.DisplayBoard();
 
-                inputAction = GetActionInput();
+                (actType, actCol, actRow) = GetAction(board.w, board.h);
 
-                string[] actionArgs = inputAction.Split();
-                char actType = Convert.ToChar(actionArgs[0]);
-                int actRow = Convert.ToInt32(actionArgs[1]);
-                int actCol = Convert.ToInt32(actionArgs[2]);
                 int actInd = actRow * board.w + actCol;
 
                 switch (actType)
@@ -62,16 +59,14 @@ namespace Game
                     case 'F':
                         board.ToggleFlag(actRow, actCol);
                         break;
-
-                    default:
-                        break;
                 }
             }
 
             return 0;
         }
 
-        private static (char, int, int) GetAction()
+        // Prompts the player to input an action
+        private static (char, int, int) GetAction(int boardWidth, int boardHeight)
         {
             Console.Write("\nAction:\n> ");
             string? inputAction;
@@ -79,19 +74,40 @@ namespace Game
             {
                 inputAction = Console.ReadLine();
             }
-            while (!IsActionValid(inputAction));
+            while (string.IsNullOrWhiteSpace(inputAction) || !IsActionValid(inputAction, boardWidth, boardHeight));
+            string[] inputParams = inputAction.Split();
+
+            return (Convert.ToChar(inputParams[0]), Convert.ToInt32(inputParams[1]), Convert.ToInt32(inputParams[2]));
         }
 
+        // Do the dirty work of validating user input
         private static bool IsActionValid(string actionStr, int boardWidth, int boardHeight)
         {
-            string[] actionParams = actionStr.Split();
+            string[] actionParams = actionStr.Trim().Split();
             if (actionStr.Split().Length != 3)
             {
                 return false;
             }
 
+            if (actionParams[0].Length != 1)
+            {
+                return false;
+            }
+
             char actionType = Convert.ToChar(actionParams[0]);
-            int[] actionCoords = {Convert.ToInt32(actionParams[1]), Convert.ToInt32(actionParams[2])};
+            int[] actionCoords = [Convert.ToInt32(actionParams[1]), Convert.ToInt32(actionParams[2])];
+
+            if (actionCoords[0] < 0 || actionCoords[0] >= boardWidth)
+            {
+                return false;
+            }
+
+            if (actionCoords[1] < 0 || actionCoords[1] >= boardHeight)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 
