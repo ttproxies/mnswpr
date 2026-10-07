@@ -5,10 +5,16 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Security.AccessControl;
 
-namespace Game
+namespace _
 {
     class Game
     {
+        enum ActionType
+        {
+            Uncover,
+            Flag
+        }
+
         public static int Main(string[] args)
         {
             if (args.Length != 3)
@@ -24,15 +30,31 @@ namespace Game
             int mines = int.Parse(args[2]);
 
             var board = new Board(w, h, mines);
-            bool playing = true;
+            bool playing = false;
+            char actType;
+            int actCol, actRow;
+
+            // Game init loop
+            while (!playing)
+            {
+                board.DisplayBoard();
+
+                (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
+                if (actType == 'U')
+                {
+                    playing = true;
+                    board.GenerateMines(actRow, actCol);
+                }
+            }
+
+            // TODO: remove all flags
 
             // Main game loop
             while (playing)
             {
                 board.DisplayBoard();
 
-                var (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
-                int actInd = actRow * board.w + actCol;
+                (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
 
                 playing = HandleAction(actType, actCol, actRow, board);
             }
@@ -148,11 +170,11 @@ namespace Game
         }
 
         // Distibutes mines across the board and sets boardMines accordingly
-        private void GenerateMines(int clickRow, int clickColumn)
+        public void GenerateMines(int clickRow, int clickColumn)
         {
             Random rand = new();
-            int[] pickedIndices = new int[this.mines - 1];
-            pickedIndices[0] = clickRow * this.w + clickColumn;
+            int clickIndex = clickRow * this.w + clickColumn;
+            int[] pickedIndices = new int[this.mines];
 
             int curIndex;
             for (int i = 0; i < this.mines; i++)
@@ -161,7 +183,7 @@ namespace Game
                 {
                     curIndex = rand.Next(this.w * this.h);
                 }
-                while (!pickedIndices.Contains(curIndex));
+                while (pickedIndices.Contains(curIndex) || curIndex == clickIndex);
                 this.boardMines[curIndex] = true;
             }
         }
@@ -239,7 +261,14 @@ namespace Game
                     switch (this.boardStates[i * w + j])
                     {
                         case TileState.Unknown:
-                            Console.Write("◩ ");
+                            if (this.boardMines[i * w + j])
+                            {
+                                Console.Write("X ");
+                            }
+                            else
+                            {
+                                Console.Write("◩ ");
+                            }
                             break;
 
                         case TileState.Uncovered:
