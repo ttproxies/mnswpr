@@ -269,7 +269,7 @@ namespace Game
                 return false;
             }
 
-            // Evil wizardry (check for wrapping)
+            // Evil freaking wizardry (check for wrapping)
             if (adjInd % this.w != relInd % this.w + j || (int)(adjInd / this.w) != (int)(relInd / this.w) + i)
             {
                 return false;
