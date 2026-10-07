@@ -1,20 +1,9 @@
 ﻿using System;
-using System.CodeDom.Compiler;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
-using System.Globalization;
-using System.Security.AccessControl;
 
 namespace _
 {
     class Game
     {
-        enum ActionType
-        {
-            Uncover,
-            Flag
-        }
-
         public static int Main(string[] args)
         {
             if (args.Length != 3)
@@ -44,6 +33,7 @@ namespace _
                 {
                     playing = true;
                     board.GenerateMines(actRow, actCol);
+                    board.Flood(actRow, actCol);
                 }
             }
 
@@ -56,14 +46,14 @@ namespace _
 
                 (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
 
-                playing = HandleAction(actType, actCol, actRow, board);
+                playing = HandleAction(actType, actRow, actCol, board);
             }
 
             return 0;
         }
 
         // Handles action side-effects and returns whether game can continue
-        private static bool HandleAction(int actType, int actCol, int actRow, Board board)
+        private static bool HandleAction(int actType, int actRow, int actCol, Board board)
         {
             switch (actType)
             {
@@ -153,9 +143,11 @@ namespace _
             Exploded
         }
 
+        private const int spawnRadius = 2;
+
         public readonly int w, h, mines;
-        private TileState[] boardStates;
-        private bool[] boardMines;
+        private readonly TileState[] boardStates;
+        private readonly bool[] boardMines;
 
         public Board(int w, int h, int mines)
         {
@@ -183,9 +175,18 @@ namespace _
                 {
                     curIndex = rand.Next(this.w * this.h);
                 }
-                while (pickedIndices.Contains(curIndex) || curIndex == clickIndex);
+                while (pickedIndices.Contains(curIndex) || !IsInRadiusProximity(curIndex, clickIndex));
                 this.boardMines[curIndex] = true;
             }
+        }
+
+        private bool IsInRadiusProximity(int relInd, int targInd)
+        {
+            int relX = relInd % this.w, relY = (int)(relInd / this.w);
+            int targX = relInd % this.w, targY = (int)(relInd / this.w);
+
+            return (targX >= relX - spawnRadius && targX <= relX + spawnRadius) &&
+                    (targY >= relY - spawnRadius && targY <= relY + spawnRadius);
         }
 
         // Returns number of neighboring mines
@@ -197,7 +198,7 @@ namespace _
             {
                 for (int j = -1; j <= 1; j++)
                 {
-                    curInd = row + this.w * i + column + j;
+                    curInd = (row + i) * this.w + (column + j);
                     if (curInd >= 0 && curInd < this.w * this.h && this.boardMines[curInd])
                     {
                         mines++;
