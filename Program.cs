@@ -94,7 +94,6 @@ namespace Game
             {
                 return false;
             }
-
             if (actionParams[0].Length != 1)
             {
                 return false;
