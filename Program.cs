@@ -173,7 +173,7 @@ namespace _
         public void GenerateMines(int clickRow, int clickColumn)
         {
             Random rand = new();
-            int clickIndex = clickRow * this.w + clickColumn;
+            int clickIndex = Utility.CoordsToInd(clickRow, clickColumn, this.w);
             int[] pickedIndices = new int[this.mines];
 
             int curIndex;
@@ -188,17 +188,18 @@ namespace _
             }
         }
 
+        // Returns whether targInd is in spawnRadius distance of relInd
         private bool IsInRadiusProximity(int relInd, int targInd)
         {
-            int relX = relInd % this.w, relY = (int)(relInd / this.w);
-            int targX = relInd % this.w, targY = (int)(relInd / this.w);
+            var (relY, relX) = Utility.IndToCoords(relInd, this.w);
+            var (targY, targX) = Utility.IndToCoords(targInd, this.w);
 
             return (targX >= relX - spawnRadius && targX <= relX + spawnRadius) &&
-                    (targY >= relY - spawnRadius && targY <= relY + spawnRadius);
+                    (targY >= relY - spawnRadius* this.w && targY <= relY + spawnRadius * this.w);
         }
 
         // Returns number of neighboring mines
-        private int MinesInProximity(int row, int column)
+        private int MinesInProximity(int row, int col)
         {
             int mines = 0;
             int curInd;
@@ -206,8 +207,8 @@ namespace _
             {
                 for (int j = -1; j <= 1; j++)
                 {
-                    curInd = (row + i) * this.w + (column + j);
-                    if (curInd >= 0 && curInd < this.w * this.h && this.boardMines[curInd])
+                    curInd = Utility.CoordsToInd(row + i, col + j, this.w);
+                    if (IsAdjacent(curInd, ))
                     {
                         mines++;
                     }
@@ -224,7 +225,7 @@ namespace _
             queue ??= [];
 
             // Mark current index as visited and uncover tile
-            int ind = this.w * row + col;
+            int ind = Utility.CoordsToInd(row, col, this.w);
             visited.Add(ind);
             if (GetTileState(row, col) != TileState.Flagged)
             {
@@ -239,8 +240,8 @@ namespace _
                 {
                     for (int j = -1; j <= 1; j++)
                     {
-                        adjInd = ind + this.w * i + j;
-                        if (!visited.Contains(adjInd) && !queue.Contains(adjInd) && IsValidAdj(adjInd, ind, i, j))
+                        adjInd = ind + Utility.CoordsToInd(i, j, this.w);
+                        if (!visited.Contains(adjInd) && !queue.Contains(adjInd) && IsAdjacent(adjInd, ind, i, j))
                         {
                             queue.Enqueue(adjInd);
                         }
@@ -254,7 +255,8 @@ namespace _
             }
 
             int nextInd = queue.Dequeue();
-            Flood((int)(nextInd / this.w), nextInd % this.w, visited, queue);
+            var (nextRow, nextCol) = Utility.IndToCoords(nextInd, this.w);
+            Flood(nextRow, nextCol, visited, queue);
         }
 
         // Displays the current state of the board
@@ -298,8 +300,8 @@ namespace _
             }
         }
 
-        // Returns whether an index is in range relative to original index
-        private bool IsValidAdj(int adjInd, int relInd, int i, int j)
+        // Returns whether adjInd is actually adjacent to relInd for given dy and dx offsets
+        private bool IsAdjacent(int adjInd, int relInd, int dy, int dx)
         {
             // Trivial bounds checking
             if (adjInd < 0 || adjInd >= this.w * this.h)
@@ -308,7 +310,7 @@ namespace _
             }
 
             // Evil freaking wizardry (check for wrapping)
-            if (adjInd % this.w != relInd % this.w + j || (int)(adjInd / this.w) != (int)(relInd / this.w) + i)
+            if (adjInd % this.w != relInd % this.w + dx || (int)(adjInd / this.w) != (int)(relInd / this.w) + dy)
             {
                 return false;
             }
@@ -364,6 +366,20 @@ namespace _
             {
                 SetTileState(row, column, TileState.Unknown);
             }
+        }
+    }
+    
+    class Utility
+    {
+        // Returns (row, col) coordinates for ind
+        public static (int, int) IndToCoords(int ind, int w)
+        {
+            return ((int)(ind / w), ind % w);   
+        }
+
+        public static int CoordsToInd(int row, int col, int w)
+        {
+            return row * w + col;
         }
     }
 }
