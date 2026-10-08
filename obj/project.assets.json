@@ -14,7 +14,7 @@
     "version": "1.0.0",
     "restore": {
       "projectUniqueName": "C:\\Users\\Admin\\mnswpr\\..csproj",
-      "projectName": ".",
+      "projectName": "mnswpr",
       "projectPath": "C:\\Users\\Admin\\mnswpr\\..csproj",
       "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Admin\\mnswpr\\obj\\",

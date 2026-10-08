@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace _
+namespace mnswpr
 {
     class Game
     {

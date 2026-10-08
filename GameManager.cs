@@ -1,4 +1,4 @@
-namespace _
+namespace mnswpr
 {
     class GameManager
     {
