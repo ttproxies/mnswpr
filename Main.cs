@@ -20,7 +20,7 @@ namespace _
 
             var board = new Board(w, h, mines);
             bool playing = false;
-            
+
             char actType = '.';
             int actCol = -1, actRow = -1;
 
@@ -30,11 +30,15 @@ namespace _
                 board.DisplayBoard();
 
                 (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
-                playing = HandleAction(actType, actRow, actCol, board);
-            }
+                if (actType == 'U')
+                {
+                    board.GenerateMines(actRow, actCol);
+                    board.RemoveStarterFlags();
+                    playing = true;
+                }
 
-            board.RemoveStarterFlags();
-            board.GenerateMines(actRow, actCol);
+                HandleAction(actType, actRow, actCol, board);
+            }
 
             // Main game loop
             while (playing)

@@ -1,0 +1,7 @@
+namespace _
+{
+    class GameManager
+    {
+        
+    }
+}
