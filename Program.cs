@@ -20,8 +20,9 @@ namespace _
 
             var board = new Board(w, h, mines);
             bool playing = false;
-            char actType;
-            int actCol, actRow;
+            
+            char actType = '.';
+            int actCol = -1, actRow = -1;
 
             // Game init loop
             while (!playing)
@@ -29,15 +30,11 @@ namespace _
                 board.DisplayBoard();
 
                 (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
-                if (actType == 'U')
-                {
-                    playing = true;
-                    board.GenerateMines(actRow, actCol);
-                    board.Flood(actRow, actCol);
-                }
+                playing = HandleAction(actType, actRow, actCol, board);
             }
 
-            // TODO: remove all flags
+            board.GenerateMines(actRow, actCol);
+            board.RemoveStarterFlags();
 
             // Main game loop
             while (playing)
@@ -47,6 +44,7 @@ namespace _
                 (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
 
                 playing = HandleAction(actType, actRow, actCol, board);
+                // playing = board.AllMinesFlagged();
             }
 
             return 0;
@@ -116,7 +114,7 @@ namespace _
             try
             {
                 actionCoords = [Convert.ToInt32(actionParams[1]), Convert.ToInt32(actionParams[2])];
-            } 
+            }
             catch (Exception)
             {
                 return false;
@@ -183,7 +181,7 @@ namespace _
                 {
                     curIndex = rand.Next(this.w * this.h);
                 }
-                while (pickedIndices.Contains(curIndex) || !IsInRadiusProximity(curIndex, clickIndex));
+                while (pickedIndices.Contains(curIndex) || IsInRadiusProximity(curIndex, clickIndex));
                 this.boardMines[curIndex] = true;
             }
         }
@@ -194,8 +192,8 @@ namespace _
             var (relY, relX) = Utility.IndToCoords(relInd, this.w);
             var (targY, targX) = Utility.IndToCoords(targInd, this.w);
 
-            return (targX >= relX - spawnRadius && targX <= relX + spawnRadius) &&
-                    (targY >= relY - spawnRadius* this.w && targY <= relY + spawnRadius * this.w);
+            return targX >= relX - spawnRadius && targX <= relX + spawnRadius &&
+                    targY >= relY - spawnRadius && targY <= relY + spawnRadius;
         }
 
         // Returns number of neighboring mines
@@ -208,7 +206,7 @@ namespace _
                 for (int j = -1; j <= 1; j++)
                 {
                     curInd = Utility.CoordsToInd(row + i, col + j, this.w);
-                    if (IsAdjacent(curInd, ))
+                    if (IsAdjacent(curInd, Utility.CoordsToInd(row, col, this.w), i, j) && this.boardMines[curInd])
                     {
                         mines++;
                     }
@@ -272,14 +270,7 @@ namespace _
                     switch (this.boardStates[i * w + j])
                     {
                         case TileState.Unknown:
-                            if (this.boardMines[i * w + j])
-                            {
-                                Console.Write("X ");
-                            }
-                            else
-                            {
-                                Console.Write("◩ ");
-                            }
+                            Console.Write("◩ ");
                             break;
 
                         case TileState.Uncovered:
@@ -316,6 +307,18 @@ namespace _
             }
 
             return true;
+        }
+
+        // Removes all flags placed before mines were generated
+        public void RemoveStarterFlags()
+        {
+            for (int i = 0; i < this.w * this.h; i++)
+            {
+                if (this.boardStates[i] == TileState.Flagged)
+                {
+                    this.boardStates[i] = TileState.Unknown;
+                }
+            }
         }
 
         // Sets all tiles with a mine to TileState.Exploded
@@ -356,25 +359,23 @@ namespace _
         // Toggles a tile between flagged and unknown state
         public void ToggleFlag(int row, int column)
         {
-            // Maybe try to make this more elegant...
             if (GetTileState(row, column) == TileState.Unknown)
             {
                 SetTileState(row, column, TileState.Flagged);
             }
-
-            if (GetTileState(row, column) == TileState.Flagged)
+            else if (GetTileState(row, column) == TileState.Flagged)
             {
                 SetTileState(row, column, TileState.Unknown);
             }
         }
     }
-    
+
     class Utility
     {
         // Returns (row, col) coordinates for ind
         public static (int, int) IndToCoords(int ind, int w)
         {
-            return ((int)(ind / w), ind % w);   
+            return ((int)(ind / w), ind % w);
         }
 
         public static int CoordsToInd(int row, int col, int w)
