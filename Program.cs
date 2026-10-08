@@ -112,7 +112,15 @@ namespace _
             }
 
             char actionType = Convert.ToChar(actionParams[0]);
-            int[] actionCoords = [Convert.ToInt32(actionParams[1]), Convert.ToInt32(actionParams[2])];
+            int[] actionCoords;
+            try
+            {
+                actionCoords = [Convert.ToInt32(actionParams[1]), Convert.ToInt32(actionParams[2])];
+            } 
+            catch (Exception)
+            {
+                return false;
+            }
 
             if (!allowedActions.Contains(actionType))
             {
