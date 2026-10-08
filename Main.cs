@@ -13,6 +13,7 @@ namespace mnswpr
             }
 
             const string allowedActions = "UF";
+            Console.WriteLine("refactor!");
 
             int w = int.Parse(args[0]);
             int h = int.Parse(args[1]);
