@@ -9,17 +9,20 @@ namespace mnswpr
         private readonly int boardWidth;
         private readonly int boardHeight;
         private readonly int mines;
+        private Board board;
+
 
         public GameManager(int boardWidth, int boardHeight, int mines)
         {
             this.boardWidth = boardWidth;
             this.boardHeight = boardHeight;
             this.mines = mines;
+            this.board = new Board(boardWidth, boardHeight, mines);
         }
 
         public void GameInit()
         {
-            
+        
         }
 
         private static (Utility.PlayerAction, int, int) GetAction(int boardWidth, int boardHeight)

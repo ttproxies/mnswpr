@@ -9,7 +9,7 @@ namespace mnswpr
             Chord
         }
 
-        public static Dictionary<char, PlayerAction> actionCharToEnum = new Dictionary<char, PlayerAction>()
+        public static Dictionary<char, PlayerAction> actionCharToEnum = new()
         {
             { 'U', PlayerAction.Uncover },
             { 'F', PlayerAction.Flag },
@@ -22,7 +22,7 @@ namespace mnswpr
             return ((int)(ind / boardWidth), ind % boardWidth);
         }
 
-        // 
+        // Returns index for (row, col) coordinates
         public static int CoordsToInd(int row, int col, int w)
         {
             return row * w + col;

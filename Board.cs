@@ -2,18 +2,10 @@ namespace mnswpr
 {
     class Board
     {
-        public enum TileState
-        {
-            Unknown,
-            Uncovered,
-            Flagged,
-            Exploded
-        }
-
         private const int spawnRadius = 2;
 
         public readonly int w, h, mines;
-        private readonly TileState[] boardStates;
+        private readonly Tile[] boardStates;
         private readonly bool[] boardMines;
 
         public Board(int w, int h, int mines)
@@ -21,10 +13,16 @@ namespace mnswpr
             this.w = w;
             this.h = h;
             this.mines = mines;
-            this.boardStates = new TileState[w * h];
+            this.boardStates = new Tile[w * h];
             this.boardMines = new bool[w * h];
 
-            Array.Fill(boardStates, TileState.Unknown);
+            for (int i = 0; i < h; i++)
+            {
+                for (int j = 0; j < w; j++)
+                {
+                    boardStates[i * w + j] = new Tile((j, i), 0, false);
+                }
+            }
             Array.Fill(boardMines, false);
         }
 
