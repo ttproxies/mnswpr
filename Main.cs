@@ -11,8 +11,6 @@ namespace mnswpr
                 Console.Error.WriteLine("Usage: dotnet run <w> <h> <mines>");
                 return 1;
             }
-
-            const string allowedActions = "UF";
             
             var game = new GameManager();
 
@@ -23,37 +21,39 @@ namespace mnswpr
             var board = new Board(w, h, mines);
             bool playing = false;
 
-            char actType = '.';
-            int actCol = -1, actRow = -1;
+            var gameManager = new GameManager();
 
-            // Game init loop
-            while (!playing)
-            {
-                board.DisplayBoard();
+            // char actType = '.';
+            // int actCol = -1, actRow = -1;
 
-                (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
-                if (actType == 'U')
-                {
-                    board.GenerateMines(actRow, actCol);
-                    board.RemoveStarterFlags();
-                    playing = true;
-                }
+            // // Game init loop
+            // while (!playing)
+            // {
+            //     board.DisplayBoard();
 
-                HandleAction(actType, actRow, actCol, board);
-            }
+            //     (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
+            //     if (actType == 'U')
+            //     {
+            //         board.GenerateMines(actRow, actCol);
+            //         board.RemoveStarterFlags();
+            //         playing = true;
+            //     }
 
-            // Main game loop
-            while (playing)
-            {
-                board.DisplayBoard();
+            //     HandleAction(actType, actRow, actCol, board);
+            // }
 
-                (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
+            // // Main game loop
+            // while (playing)
+            // {
+            //     board.DisplayBoard();
 
-                playing = HandleAction(actType, actRow, actCol, board);
-                // playing = board.AllMinesFlagged();
-            }
+            //     (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
 
-            return 0;
+            //     playing = HandleAction(actType, actRow, actCol, board);
+            //     // playing = board.AllMinesFlagged();
+            // }
+
+            // return 0;
         }
 
         
