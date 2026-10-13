@@ -2,18 +2,10 @@ namespace mnswpr
 {
     class Board
     {
-        public enum TileState
-        {
-            Unknown,
-            Uncovered,
-            Flagged,
-            Exploded
-        }
-
         private const int spawnRadius = 2;
 
         public readonly int w, h, mines;
-        private readonly TileState[] boardStates;
+        private readonly Tile[] boardTiles;
         private readonly bool[] boardMines;
 
         public Board(int w, int h, int mines)
@@ -21,10 +13,16 @@ namespace mnswpr
             this.w = w;
             this.h = h;
             this.mines = mines;
-            this.boardStates = new TileState[w * h];
+            this.boardTiles = new Tile[w * h];
             this.boardMines = new bool[w * h];
 
-            Array.Fill(boardStates, TileState.Unknown);
+            for (int i = 0; i < h; i++)
+            {
+                for (int j = 0; j < w; j++)
+                {
+                    boardTiles[i * w + j] = new Tile((j, i), 0, false);
+                }
+            }
             Array.Fill(boardMines, false);
         }
 
@@ -128,7 +126,7 @@ namespace mnswpr
             {
                 for (int j = 0; j < this.w; j++)
                 {
-                    switch (this.boardStates[i * w + j])
+                    switch (this.boardTiles[i * w + j])
                     {
                         case TileState.Unknown:
                             Console.Write("◩ ");
@@ -175,9 +173,9 @@ namespace mnswpr
         {
             for (int i = 0; i < this.w * this.h; i++)
             {
-                if (this.boardStates[i] == TileState.Flagged)
+                if (this.boardTiles[i] == TileState.Flagged)
                 {
-                    this.boardStates[i] = TileState.Unknown;
+                    this.boardTiles[i] = TileState.Unknown;
                 }
             }
         }
@@ -201,14 +199,14 @@ namespace mnswpr
         // Changes the tile's state to the specified state code
         public void SetTileState(int row, int column, TileState state)
         {
-            this.boardStates[this.w * row + column] = state;
+            this.boardTiles[this.w * row + column] = state;
         }
 
         // Returns the TileState value of a board tile
         public TileState GetTileState(int row, int column)
         {
             // Console.WriteLine($"{row}, {column}, {this.w * row + column}");
-            return this.boardStates[this.w * row + column];
+            return this.boardTiles[this.w * row + column];
         }
 
         // Returns whether tile has a mine or not
