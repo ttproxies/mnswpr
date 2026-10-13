@@ -18,10 +18,12 @@ namespace mnswpr
             int h = int.Parse(args[1]);
             int mines = int.Parse(args[2]);
 
+            var gameManager = new GameManager();
+
+
             var board = new Board(w, h, mines);
             bool playing = false;
 
-            var gameManager = new GameManager();
 
             // char actType = '.';
             // int actCol = -1, actRow = -1;
@@ -53,29 +55,7 @@ namespace mnswpr
             //     // playing = board.AllMinesFlagged();
             // }
 
-            // return 0;
+            return 0;
         }
-
-        
-
-        // Prompts the player to input an action
-        private static (char, int, int) GetAction(int boardWidth, int boardHeight, string allowedActions)
-        {
-            Console.Write("\nAction:\n> ");
-            string? inputAction = Console.ReadLine();
-
-            while (string.IsNullOrEmpty(inputAction) || !IsActionValid(inputAction, boardWidth, boardHeight, allowedActions))
-            {
-                Console.Write("\nInvalid input, please try again:\n> ");
-                inputAction = Console.ReadLine();
-            }
-
-            string[] inputParams = inputAction.Split();
-
-            return (Convert.ToChar(inputParams[0]), Convert.ToInt32(inputParams[1]), Convert.ToInt32(inputParams[2]));
-        }
-
-        // Do the dirty work of validating user input
-        
     }
 }

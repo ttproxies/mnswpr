@@ -2,10 +2,24 @@ namespace mnswpr
 {
     class Utility
     {
-        // Returns (row, col) coordinates for ind
-        public static (int y, int x) IndToCoords(int ind, int w)
+        public enum PlayerAction
         {
-            return ((int)(ind / w), ind % w);
+            Flag,
+            Uncover,
+            Chord
+        }
+
+        public static Dictionary<char, PlayerAction> actionCharToEnum = new Dictionary<char, PlayerAction>()
+        {
+            { 'U', PlayerAction.Uncover },
+            { 'F', PlayerAction.Flag },
+            { 'C', PlayerAction.Chord }
+        };
+
+        // Returns (row, col) coordinates for ind
+        public static (int y, int x) IndToCoords(int ind, int boardWidth)
+        {
+            return ((int)(ind / boardWidth), ind % boardWidth);
         }
 
         // 
@@ -14,7 +28,7 @@ namespace mnswpr
             return row * w + col;
         }
 
-        private static bool IsActionValid(string actionStr, int boardWidth, int boardHeight, string allowedActions)
+        public static bool IsActionValid(string actionStr, int boardWidth, int boardHeight)
         {
             string[] actionParams = actionStr.Trim().Split();
             if (actionStr.Split().Length != 3)
@@ -37,7 +51,7 @@ namespace mnswpr
                 return false;
             }
 
-            if (!allowedActions.Contains(actionType))
+            if (!actionCharToEnum.ContainsKey(actionType))
             {
                 return false;
             }
