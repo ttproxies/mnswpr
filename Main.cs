@@ -11,14 +11,12 @@ namespace mnswpr
                 Console.Error.WriteLine("Usage: dotnet run <w> <h> <mines>");
                 return 1;
             }
-            
-            var game = new GameManager();
 
-            int w = int.Parse(args[0]);
-            int h = int.Parse(args[1]);
-            int mines = int.Parse(args[2]);
+            int gameBoardWidth = int.Parse(args[0]);
+            int gameBoardHeight = int.Parse(args[1]);
+            int gameBoardMines = int.Parse(args[2]);
 
-            var gameManager = new GameManager();
+            var gameManager = new GameManager(gameBoardWidth, gameBoardHeight, gameBoardMines);
 
 
             var board = new Board(w, h, mines);

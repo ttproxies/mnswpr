@@ -8,8 +8,12 @@ namespace mnswpr
         Exploded
     }
 
-    class Tile((int x, int y) coords, int neighboringMines, bool isMine)
+    class Tile(Utility.Coordinates coords, int neighboringMines, bool isMine) 
     {
-        TileState currentState = TileState.Unknown;
+        public Utility.Coordinates Coords { get; } = coords;
+        public int NeighboringMines { get; } = neighboringMines;
+        public bool IsMine { get; } = isMine;
+
+        public TileState CurrentState { get; set; } = TileState.Unknown;
     }
-}
+} 

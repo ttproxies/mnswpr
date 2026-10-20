@@ -2,6 +2,8 @@ namespace mnswpr
 {
     class Utility
     {
+        public readonly record struct Coordinates(int X, int Y);
+
         public enum PlayerAction
         {
             Flag,
@@ -17,15 +19,15 @@ namespace mnswpr
         };
 
         // Returns (row, col) coordinates for ind
-        public static (int y, int x) IndToCoords(int ind, int boardWidth)
+        public static Coordinates IndToCoords(int ind, int boardWidth)
         {
-            return ((int)(ind / boardWidth), ind % boardWidth);
+            return new((int)(ind / boardWidth), ind % boardWidth);
         }
 
         // Returns index for (row, col) coordinates
-        public static int CoordsToInd(int row, int col, int w)
+        public static int CoordsToInd(Coordinates coords, int w)
         {
-            return row * w + col;
+            return coords.Y * w + coords.X;
         }
 
         public static bool IsActionValid(string actionStr, int boardWidth, int boardHeight)

@@ -4,33 +4,32 @@ namespace mnswpr
     {
         private const int spawnRadius = 2;
 
-        public readonly int w, h, mines;
+        public readonly int width, height, mines;
         private readonly Tile[] boardTiles;
         private readonly bool[] boardMines;
 
-        public Board(int w, int h, int mines)
+        public Board(int width, int height, int mines)
         {
-            this.w = w;
-            this.h = h;
+            this.width = width;
+            this.height = height;
             this.mines = mines;
-            this.boardTiles = new Tile[w * h];
-            this.boardMines = new bool[w * h];
+            this.boardTiles = new Tile[width * height];
+            this.boardMines = new bool[width * height];
 
-            for (int i = 0; i < h; i++)
+            for (int i = 0; i < height; i++)
             {
-                for (int j = 0; j < w; j++)
+                for (int j = 0; j < width; j++)
                 {
-                    boardTiles[i * w + j] = new Tile((j, i), 0, false);
+                    boardTiles[i * width + j] = new((j, i), 0, false);
                 }
             }
-            Array.Fill(boardMines, false);
         }
 
         // Distibutes mines across the board and sets boardMines accordingly
-        public void GenerateMines(int clickRow, int clickColumn)
+        public void GenerateMines(Utility.Coordinates clickCoords)
         {
             Random rand = new();
-            int clickIndex = Utility.CoordsToInd(clickRow, clickColumn, this.w);
+            int clickIndex = Utility.CoordsToInd(clickCoords, this.width);
             int[] pickedIndices = new int[this.mines];
 
             int curIndex;
@@ -38,18 +37,18 @@ namespace mnswpr
             {
                 do
                 {
-                    curIndex = rand.Next(this.w * this.h);
+                    curIndex = rand.Next(this.width * this.height);
                 }
                 while (pickedIndices.Contains(curIndex) || IsInRadiusProximity(curIndex, clickIndex));
-                this.boardMines[curIndex] = true;
+                this.boardTiles[curIndex].SetTileMine();
             }
         }
 
         // Returns whether targInd is in spawnRadius distance of relInd
         private bool IsInRadiusProximity(int relInd, int targInd)
         {
-            var (relY, relX) = Utility.IndToCoords(relInd, this.w);
-            var (targY, targX) = Utility.IndToCoords(targInd, this.w);
+            var (relY, relX) = Utility.IndToCoords(relInd, this.width);
+            var (targY, targX) = Utility.IndToCoords(targInd, this.height);
 
             return targX >= relX - spawnRadius && targX <= relX + spawnRadius &&
                     targY >= relY - spawnRadius && targY <= relY + spawnRadius;
@@ -64,8 +63,8 @@ namespace mnswpr
             {
                 for (int j = -1; j <= 1; j++)
                 {
-                    curInd = Utility.CoordsToInd(row + i, col + j, this.w);
-                    if (IsAdjacent(curInd, Utility.CoordsToInd(row, col, this.w), i, j) && this.boardMines[curInd])
+                    curInd = Utility.CoordsToInd(row + i, col + j, this.width);
+                    if (IsAdjacent(curInd, Utility.CoordsToInd(row, col, this.width), i, j) && this.boardMines[curInd])
                     {
                         mines++;
                     }
@@ -82,7 +81,7 @@ namespace mnswpr
             queue ??= [];
 
             // Mark current index as visited and uncover tile
-            int ind = Utility.CoordsToInd(row, col, this.w);
+            int ind = Utility.CoordsToInd(row, col, this.width);
             visited.Add(ind);
             if (GetTileState(row, col) != TileState.Flagged)
             {
@@ -97,7 +96,7 @@ namespace mnswpr
                 {
                     for (int j = -1; j <= 1; j++)
                     {
-                        adjInd = ind + Utility.CoordsToInd(i, j, this.w);
+                        adjInd = ind + Utility.CoordsToInd(i, j, this.width);
                         if (!visited.Contains(adjInd) && !queue.Contains(adjInd) && IsAdjacent(adjInd, ind, i, j))
                         {
                             queue.Enqueue(adjInd);
@@ -112,7 +111,7 @@ namespace mnswpr
             }
 
             int nextInd = queue.Dequeue();
-            var (nextRow, nextCol) = Utility.IndToCoords(nextInd, this.w);
+            var (nextRow, nextCol) = Utility.IndToCoords(nextInd, this.width);
             Flood(nextRow, nextCol, visited, queue);
         }
 
@@ -122,11 +121,11 @@ namespace mnswpr
             Console.WriteLine("\x1b[3J");
             Console.Clear();
             int neighboringMines;
-            for (int i = 0; i < this.h; i++)
+            for (int i = 0; i < this.height; i++)
             {
-                for (int j = 0; j < this.w; j++)
+                for (int j = 0; j < this.width; j++)
                 {
-                    switch (this.boardTiles[i * w + j])
+                    switch (this.boardTiles[i * width + j].CurrentState)
                     {
                         case TileState.Unknown:
                             Console.Write("◩ ");
