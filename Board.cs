@@ -18,11 +18,15 @@ namespace mnswpr
             for (int i = 0; i < width * height; i++)
             {
                 BoardTiles[i] = new Tile(IndToCoords(i));
-                foreach (Utility.Coordinates adjacentCoords in Utility.ADJACENT_COORD_OFFSETS)
+                foreach (Utility.Coordinates offsetCoords in Utility.ADJACENT_COORD_OFFSETS)
                 {
-                    if (BoardTiles[i].Coords + adjacentCoords)
+                    // Cache adjacent coordinates if valid
+                    Utility.Coordinates relativeCoords = BoardTiles[i].Coords;
+                    Utility.Coordinates adjacentCoords = relativeCoords + offsetCoords;
+                    
+                    if (IsAdjacent(relativeCoords, offsetCoords))
                     {
-                        
+                        BoardTiles[i].AdjacentIndexes.Add(CoordsToInd(adjacentCoords));
                     }
                 }
             }
@@ -33,17 +37,22 @@ namespace mnswpr
         {
             Random rand = new();
             int clickIndex = CoordsToInd(clickCoords);
-            int[] pickedIndices = new int[Mines];
+            int[] pickedIndexes = new int[Mines];
 
-            int curIndex;
+            int mineIndex;
             for (int i = 0; i < Mines; i++)
             {
-                do
+                // Choose a random index to place the mine
+                do { mineIndex = rand.Next(Width * Height); }
+                while (pickedIndexes.Contains(mineIndex) || IsAdjacent(mineIndex, clickIndex));
+                
+                BoardTiles[mineIndex].IsMine = true;
+
+                // Increment all adjacent tiles mine counts
+                foreach (int adjacentInd in BoardTiles[mineIndex].AdjacentIndexes)
                 {
-                    curIndex = rand.Next(Width * Height);
+                    BoardTiles[adjacentInd].AdjacentMines++;
                 }
-                while (pickedIndices.Contains(curIndex) || IsInRadiusProximity(curIndex, clickIndex));
-                BoardTiles[curIndex].IsMine = true;
             }
         }
 
@@ -140,22 +149,23 @@ namespace mnswpr
             }
         }
 
-        // Returns whether adjInd is actually adjacent to relInd for given dy and dx offsets
-        private bool IsAdjacent(int adjInd, int relInd, int dy, int dx)
+        // Returns whether targCoords is adjacent to relCoords
+        private bool IsAdjacent(Utility.Coordinates relCoords, Utility.Coordinates targCoords)
         {
-            // Trivial bounds checking
-            if (adjInd < 0 || adjInd >= this.w * this.h)
-            {
-                return false;
-            }
-
-            // Evil freaking wizardry (check for wrapping)
-            if (adjInd % this.w != relInd % this.w + dx || (int)(adjInd / this.w) != (int)(relInd / this.w) + dy)
-            {
-                return false;
-            }
+            // Bounds checking
+            if (targCoords.X < 0 || targCoords.X >= Width
+             || targCoords.Y < 0 || targCoords.Y >= Height) return false;
+            
+            // Adjacency
+            if (Math.Abs(relCoords.X - targCoords.X) != 1
+             || Math.Abs(relCoords.Y - targCoords.Y) != 1) return false;
 
             return true;
+        }
+
+        private bool IsAdjacent(int relInd, int targInd)
+        {
+            return IsAdjacent(IndToCoords(relInd), IndToCoords(targInd));
         }
 
         // Removes all flags placed before mines were generated

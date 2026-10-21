@@ -38,7 +38,7 @@ namespace mnswpr
             { 'C', PlayerAction.Chord }
         };
 
-        // Perform input checking
+        // Perform input checking TODO: write as regex
         public static bool IsActionValid(string actionStr, int boardWidth, int boardHeight)
         {
             string[] actionParams = actionStr.Trim().Split();

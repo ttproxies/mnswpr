@@ -1,7 +1,7 @@
 namespace mnswpr
 {
     class GameManager(int boardWidth, int boardHeight, int mines)
-    {
+    { 
         private bool playing = false;
         private int actionX, actionY;
         private Utility.PlayerAction actionType;

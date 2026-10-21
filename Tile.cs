@@ -14,8 +14,8 @@ namespace mnswpr
 
         public TileState CurrentState { get; set; } = TileState.Unknown;
         public List<int> AdjacentIndexes { get; } = [];
-        
+
         public bool IsMine { get; set; } = false;
-        public int AdjacentMines { get; } = 0;
+        public int AdjacentMines { get; set; } = 0;
     }
 }
