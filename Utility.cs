@@ -2,7 +2,27 @@ namespace mnswpr
 {
     class Utility
     {
-        public readonly record struct Coordinates(int X, int Y);
+        public readonly record struct Coordinates(int CoordX, int CoordY)
+        {
+            public int X { get; } = CoordX;
+            public int Y { get; } = CoordY;
+
+            public static Coordinates operator +(Coordinates operandLeft, Coordinates operandRight)
+                => new(operandLeft.X + operandRight.X, operandLeft.Y + operandRight.Y);
+        }
+
+        public static readonly Coordinates[] ADJACENT_COORD_OFFSETS = [
+            new Coordinates(-1, -1),
+            new Coordinates(0, -1),
+            new Coordinates(1, -1),
+
+            new Coordinates(-1, 0),
+            new Coordinates(1, 0),
+
+            new Coordinates(-1, 1),
+            new Coordinates(0, 1),
+            new Coordinates(1, 1),
+        ];
 
         public enum PlayerAction
         {

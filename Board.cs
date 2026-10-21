@@ -1,7 +1,5 @@
 namespace mnswpr
 {
-    
-
     class Board
     {
         public int Width { get; init; }
@@ -17,11 +15,15 @@ namespace mnswpr
             Mines = mines;
             BoardTiles = new Tile[width * height];
 
-            for (int i = 0; i < height; i++)
+            for (int i = 0; i < width * height; i++)
             {
-                for (int j = 0; j < width; j++)
+                BoardTiles[i] = new Tile(IndToCoords(i));
+                foreach (Utility.Coordinates adjacentCoords in Utility.ADJACENT_COORD_OFFSETS)
                 {
-                    BoardTiles[i * width + j] = new(new(j, i), 0, false);
+                    if (BoardTiles[i].Coords + adjacentCoords)
+                    {
+                        
+                    }
                 }
             }
         }
@@ -43,13 +45,6 @@ namespace mnswpr
                 while (pickedIndices.Contains(curIndex) || IsInRadiusProximity(curIndex, clickIndex));
                 BoardTiles[curIndex].IsMine = true;
             }
-        }
-
-        // Returns whether targInd is in spawnRadius distance of relInd
-        private static bool IsInRadiusProximity(Utility.Coordinates relCoords, Utility.Coordinates targCoords)
-        {
-            return targCoords.X >= relCoords.X - spawnRadius && targCoords.X <= relCoords.X + spawnRadius &&
-                    targCoords.Y >= relCoords.Y - spawnRadius && targCoords.Y <= relCoords.Y + spawnRadius;
         }
 
         // Returns number of neighboring mines relative to coords
@@ -99,7 +94,7 @@ namespace mnswpr
                     }
                 }
             }
-        
+
 
             if (queue.Count == 0)
             {
