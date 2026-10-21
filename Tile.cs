@@ -12,7 +12,7 @@ namespace mnswpr
     {
         public Utility.Coordinates Coords { get; } = coords;
         public int NeighboringMines { get; } = neighboringMines;
-        public bool IsMine { get; } = isMine;
+        public bool IsMine { get;set; } = isMine;
 
         public TileState CurrentState { get; set; } = TileState.Unknown;
     }

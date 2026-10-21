@@ -18,18 +18,7 @@ namespace mnswpr
             { 'C', PlayerAction.Chord }
         };
 
-        // Returns (row, col) coordinates for ind
-        public static Coordinates IndToCoords(int ind, int boardWidth)
-        {
-            return new((int)(ind / boardWidth), ind % boardWidth);
-        }
-
-        // Returns index for (row, col) coordinates
-        public static int CoordsToInd(Coordinates coords, int w)
-        {
-            return coords.Y * w + coords.X;
-        }
-
+        // Perform input checking
         public static bool IsActionValid(string actionStr, int boardWidth, int boardHeight)
         {
             string[] actionParams = actionStr.Trim().Split();
