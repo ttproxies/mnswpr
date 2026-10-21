@@ -7,8 +7,6 @@ namespace mnswpr
     {
         public static int Main(string[] args)
         {
-            
-
             int gameBoardWidth = int.Parse(args[0]);
             int gameBoardHeight = int.Parse(args[1]);
             int gameBoardMines = int.Parse(args[2]);
@@ -48,13 +46,15 @@ namespace mnswpr
             return 0;
         }
 
-        private bool IsValidGameParams(string[] args)
+        private bool IsValidGameArgs(string[] args)
         {
             if (args.Length != 3)
             {
                 Console.Error.WriteLine("Usage: dotnet run <w> <h> <mines>");
                 return false;
             }
+
+
         }
     }
 }

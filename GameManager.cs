@@ -2,6 +2,8 @@ namespace mnswpr
 {
     class GameManager(int boardWidth, int boardHeight, int mines)
     {
+        private const int spawnRadius = 1;
+
         private bool playing = false;
         private int actionX, actionY;
         private Utility.PlayerAction actionType;

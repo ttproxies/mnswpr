@@ -1,9 +1,9 @@
 namespace mnswpr
 {
+    
+
     class Board
     {
-        private const int spawnRadius = 1;
-
         public int Width { get; init; }
         public int Height { get; init; }
         public int Mines { get; init; }
@@ -30,7 +30,7 @@ namespace mnswpr
         public void GenerateMines(Utility.Coordinates clickCoords)
         {
             Random rand = new();
-            int clickIndex = Utility.CoordsToInd(clickCoords, Width);
+            int clickIndex = CoordsToInd(clickCoords);
             int[] pickedIndices = new int[Mines];
 
             int curIndex;
@@ -46,19 +46,16 @@ namespace mnswpr
         }
 
         // Returns whether targInd is in spawnRadius distance of relInd
-        private bool IsInRadiusProximity(int relInd, int targInd)
+        private static bool IsInRadiusProximity(Utility.Coordinates relCoords, Utility.Coordinates targCoords)
         {
-            var (relY, relX) = Utility.IndToCoords(relInd, Width);
-            var (targY, targX) = Utility.IndToCoords(targInd, Height);
-
-            return targX >= relX - spawnRadius && targX <= relX + spawnRadius &&
-                    targY >= relY - spawnRadius && targY <= relY + spawnRadius;
+            return targCoords.X >= relCoords.X - spawnRadius && targCoords.X <= relCoords.X + spawnRadius &&
+                    targCoords.Y >= relCoords.Y - spawnRadius && targCoords.Y <= relCoords.Y + spawnRadius;
         }
 
-        // Returns number of neighboring mines
-        private int MinesInProximity(int row, int col)
+        // Returns number of neighboring mines relative to coords
+        private int CountAdjacent(Utility.Coordinates coords, Tile.TileState tileState)
         {
-            int mines = 0;
+            int stateCount = 0;
             for (int i = -1; i <= 1; i++)
             {
                 for (int j = -1; j <= 1; j++)
@@ -95,7 +92,7 @@ namespace mnswpr
             {
                 for (int j = -1; j <= 1; j++)
                 {
-                    int adjInd = ind + Utility.CoordsToInd(i, j, Width);
+                    int adjInd = ind + CoordsToInd(new(i, j));
                     if (!visited.Contains(adjInd) && !queue.Contains(adjInd) && IsAdjacent(adjInd, ind, i, j))
                     {
                         queue.Enqueue(adjInd);
