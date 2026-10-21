@@ -2,6 +2,20 @@ namespace mnswpr
 {
     class Utility
     {
+        // Defines an array indexable with Utility.Coordinates for convenience
+        public class TileMatrix(int matrixWidth, int matrixHeight)
+        {
+            private readonly Tile[] tilesArr = [];
+            public int Width { get; } = matrixWidth;
+            public int Height { get; } = matrixHeight;
+
+            public Tile this[Coordinates coords]
+            {
+                get => tilesArr[coords.Y * Width + coords.X];
+                set => tilesArr[coords.Y * Width + coords.X] = value;
+            }
+        }
+
         public readonly record struct Coordinates(int CoordX, int CoordY)
         {
             public int X { get; } = CoordX;
