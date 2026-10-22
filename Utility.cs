@@ -1,9 +1,11 @@
+using System.Collections;
+
 namespace mnswpr
 {
     class Utility
     {
-        // Defines an array indexable with Utility.Coordinates for convenience
-        public class TileMatrix(int matrixWidth, int matrixHeight)
+        // Defines an IEnumerable indexable with Utility.Coordinates for convenience
+        public class TileMatrix(int matrixWidth, int matrixHeight) : IEnumerable<Tile>
         {
             private readonly Tile[] tilesArr = [];
             public int Width { get; } = matrixWidth;
@@ -13,6 +15,17 @@ namespace mnswpr
             {
                 get => tilesArr[coords.Y * Width + coords.X];
                 set => tilesArr[coords.Y * Width + coords.X] = value;
+            }
+
+            public IEnumerator<Tile> GetEnumerator()
+            {
+                foreach (Tile tile in tilesArr)
+                    yield return tile;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
             }
         }
 

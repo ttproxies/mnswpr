@@ -13,9 +13,7 @@ namespace mnswpr
 
         public Board(int width, int height, int mines)
         {
-            Width = width;
-            Height = height;
-            Mines = mines;
+            (Width, Height, Mines) = (width, height, mines);
             BoardTiles = new(Width, Height);
 
             for (int x = 0; x < width; x++)
@@ -168,16 +166,15 @@ namespace mnswpr
         }
 
         // Toggles a tile between flagged and unknown state
-        public void ToggleFlag(Utility.Coordinates)
+        public void ToggleFlag(Tile tile)
         {
-            if (GetTileState(row, column) == TileState.Unknown)
+            // Pretty code courtesy of Claude :3 (C#8 switch expressions, could otherwise use a normal switch or conditional)
+            tile.CurrentState = tile.CurrentState switch
             {
-                SetTileState(row, column, TileState.Flagged);
-            }
-            else if (GetTileState(row, column) == TileState.Flagged)
-            {
-                SetTileState(row, column, TileState.Unknown);
-            }
+                Tile.TileState.Unknown => Tile.TileState.Flagged,
+                Tile.TileState.Flagged => Tile.TileState.Unknown,
+                var other              => other
+            };
         }
     }
 }
