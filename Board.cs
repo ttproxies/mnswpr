@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace mnswpr
 {
     class Board
@@ -22,47 +24,38 @@ namespace mnswpr
                 {
                     Utility.Coordinates iterCoords = new(x, y);
                     BoardTiles[iterCoords] = new Tile(iterCoords);
-                    foreach (Utility.Coordinates offsetCoords in Utility.ADJACENT_COORD_OFFSETS)
-                    {
-                        // Cache adjacent coordinates if valid
-                        Utility.Coordinates adjacentCoords = iterCoords + offsetCoords;
-
-                        if (IsAdjacent(iterCoords, offsetCoords))
-                        {
-                            BoardTiles[iterCoords].AdjacentIndexes.Add(CoordsToInd(adjacentCoords));
-                        }
-                    }
                 }
             }
         }
 
-        // Define an indexer for interpreting Coordinates as valid indices
-        public Tile this[Utility.Coordinates]
+        private IEnumerable<Utility.Coordinates> GetAdjacentCoordinates(Utility.Coordinates relCoords)
         {
-            get =>
+            foreach (Utility.Coordinates offsetCoordinates in Utility.ADJACENT_COORD_OFFSETS)
+            {
+                // Bound checking
+                if (IsAdjacent(relCoords, relCoords + offsetCoordinates))
+                    yield return relCoords + offsetCoordinates;
+            }
         }
-
+    
         // Distibutes mines across the board and sets boardMines accordingly
         public void GenerateMines(Utility.Coordinates clickCoords)
         {
             Random rand = new();
-            int clickIndex = CoordsToInd(clickCoords);
-            int[] pickedIndexes = new int[Mines];
+            var pickedCoordinates = new Utility.Coordinates[Mines];
 
-            int mineIndex;
+            Utility.Coordinates mineCoords;
             for (int i = 0; i < Mines; i++)
             {
                 // Choose a random index to place the mine
-                do { mineIndex = rand.Next(Width * Height); }
-                while (pickedIndexes.Contains(mineIndex) || IsAdjacent(mineIndex, clickIndex));
+                do { mineCoords = new(rand.Next(Width), rand.Next(Height)); }
+                while (pickedCoordinates.Contains(mineCoords) || IsAdjacent(mineCoords, clickCoords));
 
-                BoardTiles[mineIndex].IsMine = true;
+                BoardTiles[mineCoords].IsMine = true;
 
                 // Increment all adjacent tiles mine counts
-                foreach (int adjacentInd in BoardTiles[mineIndex].AdjacentIndexes)
-                {
-                    BoardTiles[adjacentInd].AdjacentMines++;
-                }
+                foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(mineCoords))
+                    BoardTiles[adjacentCoords].AdjacentMines++;
             }
         }
 
@@ -70,46 +63,44 @@ namespace mnswpr
         private int CountAdjacent(Utility.Coordinates coords, Tile.TileState tileState)
         {
             int stateCount = 0;
-            foreach (int adjacentInd in BoardTiles[CoordsToInd(coords)].AdjacentIndexes)
-            {
-                if (BoardTiles[adjacentInd].CurrentState == tileState) stateCount++;
-            }
+            foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
+                if (BoardTiles[adjacentCoords].CurrentState == tileState) stateCount++;
 
             return stateCount;
         }
 
         // Reveal all neighboring blank tiles recursively TODO: rewrite using coordinates if possible
-        public void Flood(Utility.Coordinates coords, List<int>? visited = null, Queue<int>? queue = null)
+        public void Flood(Utility.Coordinates coords, List<Utility.Coordinates>? visited = null, Queue<Utility.Coordinates>? queue = null)
         {
-            int coordsInd = CoordsToInd(coords);
-            Tile coordsTile = BoardTiles[coordsInd];
+            Tile coordsTile = BoardTiles[coords];
+
             // Init on first iteration
             visited ??= []; queue ??= [];
 
             // Mark current index as visited and uncover tile
-            visited.Add(coordsInd);
+            visited.Add(coords);
             if (coordsTile.CurrentState != Tile.TileState.Flagged)
-            {
                 coordsTile.CurrentState = Tile.TileState.Uncovered;
-            }
 
             // Add neighbors to queue if not an edge tile
             if (coordsTile.AdjacentMines > 0) return;
 
-            foreach (int adjacentInd in coordsTile.AdjacentIndexes)
+            foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
             {
-                if (!visited.Contains(adjacentInd)
-                 && !queue.Contains(adjacentInd)
-                 && IsAdjacent(coordsInd, adjacentInd))
+                if (!visited.Contains(adjacentCoords)
+                 && !queue.Contains(adjacentCoords)
+                 && IsAdjacent(coords, adjacentCoords))
                 {
-                    queue.Enqueue(adjacentInd);
+                    queue.Enqueue(adjacentCoords);
                 }
             }
 
+            // Return if nothing left in queue
             if (queue.Count == 0) return;
 
-            int nextInd = queue.Dequeue();
-            Flood(IndToCoords(nextInd), visited, queue);
+            // Otherwise, go to next tile in queue
+            Utility.Coordinates nextCoords = queue.Dequeue();
+            Flood(nextCoords, visited, queue);
         }
 
         // Displays the current state of the board
@@ -175,13 +166,6 @@ namespace mnswpr
         {
             return new((int)(ind / Width), ind % Width);
         }
-
-        // Returns index for (row, col) coordinates
-        public int CoordsToInd(Utility.Coordinates coords)
-        {
-
-        }
-
 
         // Toggles a tile between flagged and unknown state
         public void ToggleFlag(Utility.Coordinates)

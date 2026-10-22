@@ -13,7 +13,6 @@ namespace mnswpr
         public Utility.Coordinates Coords { get; } = coords;
 
         public TileState CurrentState { get; set; } = TileState.Unknown;
-        public List<int> AdjacentIndexes { get; } = [];
 
         public bool IsMine { get; set; } = false;
         public int AdjacentMines { get; set; } = 0;
