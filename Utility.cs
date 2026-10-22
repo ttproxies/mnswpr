@@ -58,7 +58,7 @@ namespace mnswpr
             Chord
         }
 
-        public static Dictionary<char, PlayerAction> actionCharToEnum = new()
+        public static Dictionary<char, PlayerAction> ACTION_CHAR_TO_ENUM = new()
         {
             { 'U', PlayerAction.Uncover },
             { 'F', PlayerAction.Flag },

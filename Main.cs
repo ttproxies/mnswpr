@@ -13,8 +13,10 @@ namespace mnswpr
 
             var gameManager = new GameManager(gameBoardWidth, gameBoardHeight, gameBoardMines);
 
-            // char actType = '.';
-            // int actCol = -1, actRow = -1;
+            while (gameManager.Playing)
+            {
+                
+            }
 
             // // Game init loop
             // while (!playing)
@@ -48,13 +50,7 @@ namespace mnswpr
 
         private bool IsValidGameArgs(string[] args)
         {
-            if (args.Length != 3)
-            {
-                Console.Error.WriteLine("Usage: dotnet run <w> <h> <mines>");
-                return false;
-            }
-
-
+            return true;
         }
     }
 }
