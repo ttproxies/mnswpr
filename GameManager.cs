@@ -1,6 +1,6 @@
 namespace mnswpr
 {
-    class GameManager(int boardWidth, int boardHeight, int mines)
+    class GameManager
     { 
         // Properties
         public bool Playing { get; private set; } = true;
@@ -12,10 +12,16 @@ namespace mnswpr
         private Utility.PlayerAction _actionType;
 
         // Constructor
-        private readonly int _boardWidth = boardWidth;
-        private readonly int _boardHeight = boardHeight;
-        private readonly int _mines = mines;
-        private readonly Board _board = new(boardWidth, boardHeight, mines);
+        private readonly int _boardWidth;
+        private readonly int _boardHeight;
+        private readonly int _mines;
+        private readonly Board _board;
+
+        public GameManager(int boardWidth, int boardHeight, int mines)
+        {
+            (_boardWidth, _boardHeight, _mines) = (boardWidth, boardHeight, mines);
+            _board = new(this, boardWidth, boardHeight, mines);   
+        }
 
         public enum GameState
         {

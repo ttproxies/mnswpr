@@ -8,6 +8,8 @@ namespace mnswpr
         public int Height { get; init; }
         public int Mines { get; init; }
 
+        private readonly GameManager _overseer;
+
         // Coordinate-indexable array
         private Utility.TileMatrix BoardTiles { get; init; }
 
@@ -18,9 +20,9 @@ namespace mnswpr
             set => BoardTiles[coords] = value;
         }
 
-        public Board(int width, int height, int mines)
+        public Board(GameManager overseer, int width, int height, int mines)
         {
-            (Width, Height, Mines) = (width, height, mines);
+            (_overseer, Width, Height, Mines) = (overseer, width, height, mines);
             BoardTiles = new(Width, Height);
 
             for (int x = 0; x < width; x++)
