@@ -11,8 +11,6 @@ namespace mnswpr
         public int Height { get; init; }
         public int Mines { get; init; }
 
-        private readonly GameManager _overseer;
-
         // Coordinate-indexable array
         private Utility.TileMatrix BoardTiles { get; init; }
 
@@ -23,9 +21,9 @@ namespace mnswpr
             set => BoardTiles[coords] = value;
         }
 
-        public Board(GameManager overseer, int width, int height, int mines)
+        public Board(int width, int height, int mines)
         {
-            (_overseer, Width, Height, Mines) = (overseer, width, height, mines);
+            (Width, Height, Mines) = (width, height, mines);
             BoardTiles = new(Width, Height);
 
             for (int x = 0; x < width; x++)
@@ -156,7 +154,6 @@ namespace mnswpr
             }
         }
 
-
         // Returns whether targCoords is adjacent to relCoords
         private bool IsAdjacent(Utility.Coordinates relCoords, Utility.Coordinates targCoords)
         {
@@ -193,10 +190,12 @@ namespace mnswpr
 
         public void RevealTile(Utility.Coordinates coords)
         {   
-            if (BoardTiles[coords].CurrentState == Tile.TileState.Flagged) return;
-            if (BoardTiles[coords].IsMine) _overseer.State = GameManager.GameState.Exploded;
-
-            BoardTiles[coords].CurrentState = Tile.TileState.Revealed;
+            Tile tile = BoardTiles[coords];
+            tile.CurrentState = tile.CurrentState switch
+            {
+                Tile.TileState.Unknown => tile.IsMine ? Tile.TileState.Exploded : Tile.TileState.Revealed,
+                var other              => other
+            };
         }
 
         // Toggles a tile between flagged and unknown state

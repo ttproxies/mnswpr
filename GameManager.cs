@@ -1,6 +1,6 @@
 namespace mnswpr
 {
-    class GameManager
+    class GameManager(int boardWidth, int boardHeight, int mines)
     { 
         // Properties
         public bool Playing { get; set; } = true;
@@ -12,16 +12,10 @@ namespace mnswpr
         private Utility.PlayerAction _actionType;
 
         // Constructor
-        private readonly int _boardWidth;
-        private readonly int _boardHeight;
-        private readonly int _mines;
-        private readonly Board _board;
-
-        public GameManager(int boardWidth, int boardHeight, int mines)
-        {
-            (_boardWidth, _boardHeight, _mines) = (boardWidth, boardHeight, mines);
-            _board = new(this, boardWidth, boardHeight, mines);   
-        }
+        private readonly int _boardWidth = boardWidth;
+        private readonly int _boardHeight = boardHeight;
+        private readonly int _mines = mines;
+        private readonly Board _board = new(boardWidth, boardHeight, mines);
 
         public enum GameState
         {
@@ -78,6 +72,8 @@ namespace mnswpr
                 case Utility.PlayerAction.Chord:
                     if (actionTile.AdjacentFlags == actionTile.AdjacentMines)
                         _board.Chord(_actionCoords);
+
+                    if 
                     break;
             }
         }
