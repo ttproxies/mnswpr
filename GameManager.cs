@@ -28,6 +28,7 @@ namespace mnswpr
         // TODO: make more elegant
         public void DisplayBoard() => _board.DisplayBoard();
 
+        // Queries for user input
         public void GetAction()
         {
             Console.Write("\nAction:\n> ");
@@ -44,6 +45,7 @@ namespace mnswpr
             (_actionType, _actionCoords) = (Utility.ACTION_CHAR_TO_ENUM[Convert.ToChar(inputParams[0])], new(Convert.ToInt32(inputParams[1]), Convert.ToInt32(inputParams[2])));
         }
     
+        // TODO: make more elegant
         public void HandleAction()
         {
             Tile actionTile = _board[_actionCoords];
@@ -62,20 +64,32 @@ namespace mnswpr
 
                     if (actionTile.IsMine)
                     {
-                        State = GameState.Exploded;
                         Playing = false;
+                        State = GameState.Exploded;
                     }
-
-                    _board.Flood(_actionCoords);
+                    else _board.Flood(_actionCoords);
+                    
                     break;
 
                 case Utility.PlayerAction.Chord:
+                    // Think about ways to make more elegant
                     if (actionTile.AdjacentFlags == actionTile.AdjacentMines)
                         _board.Chord(_actionCoords);
 
-                    if 
+                    if (_board.CountAdjacent(_actionCoords, Tile.TileState.Exploded) != 0)
+                        State = GameState.Exploded;
+
                     break;
             }
+        }
+    
+        // Determines whether game can continue
+        public void GameStatusCheck()
+        {
+            if (State == GameState.Exploded) Playing = false;
+                _board.ExplodeMines();
+
+            if (State == GameState.Completed) Playing = false;
         }
     }
 }

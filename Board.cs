@@ -1,8 +1,3 @@
-using System.Collections;
-using System.Diagnostics.Tracing;
-using System.Globalization;
-using Microsoft.VisualBasic;
-
 namespace mnswpr
 {
     class Board
@@ -68,7 +63,7 @@ namespace mnswpr
         }
 
         // Returns number of neighboring mines relative to coords
-        private int CountAdjacent(Utility.Coordinates coords, Tile.TileState tileState)
+        public int CountAdjacent(Utility.Coordinates coords, Tile.TileState tileState)
         {
             int stateCount = 0;
             foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
@@ -121,7 +116,7 @@ namespace mnswpr
         // Displays the current state of the board
         public void DisplayBoard()
         {
-            Console.WriteLine("\x1b[3J");
+            Console.WriteLine("\x1b[2J");
             Console.Clear();
 
             for (int y = 0; y < Height; y++)
@@ -196,6 +191,8 @@ namespace mnswpr
                 Tile.TileState.Unknown => tile.IsMine ? Tile.TileState.Exploded : Tile.TileState.Revealed,
                 var other              => other
             };
+
+            Console.WriteLine($"{coords} -> {tile.CurrentState}");
         }
 
         // Toggles a tile between flagged and unknown state

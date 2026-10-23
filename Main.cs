@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace mnswpr
+﻿namespace mnswpr
 {
     class Game
     {
@@ -29,10 +26,7 @@ namespace mnswpr
                         gameManager.HandleAction();
                         break;
 
-                    case GameManager.GameState.Exploded:
-                        break;
-
-                    case GameManager.GameState.Completed:
+                    default:
                         break;
                 }
             }
