@@ -15,35 +15,27 @@ namespace mnswpr
 
             while (gameManager.Playing)
             {
+                gameManager.DisplayBoard();
                 
+                switch (gameManager.State)
+                {
+                    case GameManager.GameState.Idling:
+                        gameManager.GetAction();
+                        gameManager.HandleAction();
+                        break;
+
+                    case GameManager.GameState.Playing:
+                        gameManager.GetAction();
+                        gameManager.HandleAction();
+                        break;
+
+                    case GameManager.GameState.Exploded:
+                        break;
+
+                    case GameManager.GameState.Completed:
+                        break;
+                }
             }
-
-            // // Game init loop
-            // while (!playing)
-            // {
-            //     board.DisplayBoard();
-
-            //     (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
-            //     if (actType == 'U')
-            //     {
-            //         board.GenerateMines(actRow, actCol);
-            //         board.RemoveStarterFlags();
-            //         playing = true;
-            //     }
-
-            //     HandleAction(actType, actRow, actCol, board);
-            // }
-
-            // // Main game loop
-            // while (playing)
-            // {
-            //     board.DisplayBoard();
-
-            //     (actType, actCol, actRow) = GetAction(board.w, board.h, allowedActions);
-
-            //     playing = HandleAction(actType, actRow, actCol, board);
-            //     // playing = board.AllMinesFlagged();
-            // }
 
             return 0;
         }

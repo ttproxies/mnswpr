@@ -7,7 +7,7 @@ namespace mnswpr
         // Defines an IEnumerable indexable with Utility.Coordinates for convenience
         public class TileMatrix(int matrixWidth, int matrixHeight) : IEnumerable<Tile>
         {
-            private readonly Tile[] tilesArr = [];
+            private readonly Tile[] tilesArr = new Tile[matrixWidth * matrixHeight];
             public int Width { get; } = matrixWidth;
             public int Height { get; } = matrixHeight;
 
@@ -23,6 +23,7 @@ namespace mnswpr
                     yield return tile;
             }
 
+            // Base implementation required by the interface
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
@@ -54,13 +55,13 @@ namespace mnswpr
         public enum PlayerAction
         {
             Flag,
-            Uncover,
+            Reveal,
             Chord
         }
 
         public static Dictionary<char, PlayerAction> ACTION_CHAR_TO_ENUM = new()
         {
-            { 'U', PlayerAction.Uncover },
+            { 'R', PlayerAction.Reveal },
             { 'F', PlayerAction.Flag },
             { 'C', PlayerAction.Chord }
         };
@@ -89,7 +90,7 @@ namespace mnswpr
                 return false;
             }
 
-            if (!actionCharToEnum.ContainsKey(actionType))
+            if (!ACTION_CHAR_TO_ENUM.ContainsKey(actionType))
             {
                 return false;
             }

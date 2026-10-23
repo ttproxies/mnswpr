@@ -8,26 +8,24 @@
     "net10.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Admin\\.nuget\\packages\\": {}
+    "C:\\Users\\zmono\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\Admin\\mnswpr\\mnswpr.csproj",
+      "projectUniqueName": "c:\\Users\\zmono\\OneDrive\\Asztali gép\\Projektek\\mnswpr\\mnswpr.csproj",
       "projectName": "mnswpr",
-      "projectPath": "c:\\Users\\Admin\\mnswpr\\mnswpr.csproj",
-      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\Admin\\mnswpr\\obj\\",
+      "projectPath": "c:\\Users\\zmono\\OneDrive\\Asztali gép\\Projektek\\mnswpr\\mnswpr.csproj",
+      "packagesPath": "C:\\Users\\zmono\\.nuget\\packages\\",
+      "outputPath": "c:\\Users\\zmono\\OneDrive\\Asztali gép\\Projektek\\mnswpr\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\zmono\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

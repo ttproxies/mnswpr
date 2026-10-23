@@ -5,7 +5,7 @@ namespace mnswpr
         public enum TileState
         {
             Unknown,
-            Uncovered,
+            Revealed,
             Flagged,
             Exploded
         }
@@ -14,5 +14,6 @@ namespace mnswpr
         public TileState CurrentState { get; set; } = TileState.Unknown;
         public bool IsMine { get; set; } = false;
         public int AdjacentMines { get; set; } = 0;
+        public int AdjacentFlags { get; set; } = 0;
     }
 }

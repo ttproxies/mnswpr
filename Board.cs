@@ -11,6 +11,13 @@ namespace mnswpr
         // Coordinate-indexable array
         private Utility.TileMatrix BoardTiles { get; init; }
 
+        // Return BoardTiles values
+        public Tile this[Utility.Coordinates coords]
+        {
+            get => BoardTiles[coords];
+            set => BoardTiles[coords] = value;
+        }
+
         public Board(int width, int height, int mines)
         {
             (Width, Height, Mines) = (width, height, mines);
@@ -35,7 +42,7 @@ namespace mnswpr
                     yield return relCoords + offsetCoordinates;
             }
         }
-    
+
         // Distibutes mines across the board and sets boardMines accordingly
         public void GenerateMines(Utility.Coordinates clickCoords)
         {
@@ -75,10 +82,10 @@ namespace mnswpr
             // Init on first iteration
             visited ??= []; queue ??= [];
 
-            // Mark current index as visited and uncover tile
+            // Mark current index as visited and reveal tile
             visited.Add(coords);
             if (coordsTile.CurrentState != Tile.TileState.Flagged)
-                coordsTile.CurrentState = Tile.TileState.Uncovered;
+                coordsTile.CurrentState = Tile.TileState.Revealed;
 
             // Add neighbors to queue if not an edge tile
             if (coordsTile.AdjacentMines > 0) return;
@@ -101,32 +108,47 @@ namespace mnswpr
             Flood(nextCoords, visited, queue);
         }
 
+        public void Chord(Utility.Coordinates coords)
+        {
+            foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
+            {
+                if (BoardTiles[coords].CurrentState == Tile.TileState.Unknown) Flood(coords);
+            }
+        }
+
         // Displays the current state of the board
         public void DisplayBoard()
         {
-            Console.WriteLine("\x1b[2J");
+            Console.WriteLine("\x1b[3J");
             Console.Clear();
 
-            foreach (Tile boardTile in BoardTiles)
+            for (int y = 0; y < Height; y++)
             {
-                switch (boardTile.CurrentState)
+                for (int x = 0; x < Width; x++)
                 {
-                    case Tile.TileState.Unknown:
-                        Console.Write("◩ ");
-                        break;
+                    Tile boardTile = BoardTiles[new(x, y)];
 
-                    case Tile.TileState.Uncovered:
-                        Console.Write(boardTile.AdjacentMines > 0 ? boardTile.AdjacentMines + " " : "⚬ ");
-                        break;
+                    switch (boardTile.CurrentState)
+                    {
+                        case Tile.TileState.Unknown:
+                            Console.Write("◩ ");
+                            break;
 
-                    case Tile.TileState.Flagged:
-                        Console.Write("⚐ ");
-                        break;
+                        case Tile.TileState.Revealed:
+                            Console.Write(boardTile.AdjacentMines > 0 ? boardTile.AdjacentMines + " " : "⚬ ");
+                            break;
 
-                    case Tile.TileState.Exploded:
-                        Console.Write("✴︎ ");
-                        break;
+                        case Tile.TileState.Flagged:
+                            Console.Write("⚐ ");
+                            break;
+
+                        case Tile.TileState.Exploded:
+                            Console.Write("✴︎ ");
+                            break;
+                    }
                 }
+
+                Console.WriteLine();
             }
         }
 
@@ -166,14 +188,16 @@ namespace mnswpr
         }
 
         // Toggles a tile between flagged and unknown state
-        public void ToggleFlag(Tile tile)
+        public void ToggleFlag(Utility.Coordinates coords)
         {
+            Tile tile = BoardTiles[coords];
+
             // Pretty code courtesy of Claude :3 (C#8 switch expressions, could otherwise use a normal switch or conditional)
             tile.CurrentState = tile.CurrentState switch
             {
                 Tile.TileState.Unknown => Tile.TileState.Flagged,
                 Tile.TileState.Flagged => Tile.TileState.Unknown,
-                var other              => other
+                var other => other
             };
         }
     }
