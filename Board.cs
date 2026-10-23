@@ -1,4 +1,7 @@
+using System.Collections;
+using System.Diagnostics.Tracing;
 using System.Globalization;
+using Microsoft.VisualBasic;
 
 namespace mnswpr
 {
@@ -86,8 +89,7 @@ namespace mnswpr
 
             // Mark current index as visited and reveal tile
             visited.Add(coords);
-            if (coordsTile.CurrentState != Tile.TileState.Flagged)
-                coordsTile.CurrentState = Tile.TileState.Revealed;
+            RevealTile(coords);
 
             // Add neighbors to queue if not an edge tile
             if (coordsTile.AdjacentMines > 0) return;
@@ -189,6 +191,14 @@ namespace mnswpr
             return new((int)(ind / Width), ind % Width);
         }
 
+        public void RevealTile(Utility.Coordinates coords)
+        {   
+            if (BoardTiles[coords].CurrentState == Tile.TileState.Flagged) return;
+            if (BoardTiles[coords].IsMine) _overseer.State = GameManager.GameState.Exploded;
+
+            BoardTiles[coords].CurrentState = Tile.TileState.Revealed;
+        }
+
         // Toggles a tile between flagged and unknown state
         public void ToggleFlag(Utility.Coordinates coords)
         {
@@ -199,7 +209,7 @@ namespace mnswpr
             {
                 Tile.TileState.Unknown => Tile.TileState.Flagged,
                 Tile.TileState.Flagged => Tile.TileState.Unknown,
-                var other => other
+                var other              => other
             };
         }
     }

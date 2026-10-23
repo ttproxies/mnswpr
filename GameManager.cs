@@ -3,8 +3,8 @@ namespace mnswpr
     class GameManager
     { 
         // Properties
-        public bool Playing { get; private set; } = true;
-        public GameState State { get; private set; } = GameState.Idling;
+        public bool Playing { get; set; } = true;
+        public GameState State { get; set; } = GameState.Idling;
         
         // Fields
         private readonly List<Utility.Coordinates> _flagCoords = [];
