@@ -13,20 +13,13 @@
             while (gameManager.Playing)
             {
                 gameManager.DisplayBoard();
-                
+                gameManager.GameStatusCheck();
+                                
                 switch (gameManager.State)
                 {
-                    case GameManager.GameState.Idling:
-                        gameManager.GetAction();
-                        gameManager.HandleAction();
-                        break;
-
-                    case GameManager.GameState.Playing:
-                        gameManager.GetAction();
-                        gameManager.HandleAction();
-                        break;
-
                     default:
+                        gameManager.GetAction();
+                        gameManager.HandleAction();
                         break;
                 }
             }

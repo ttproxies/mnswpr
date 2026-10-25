@@ -7,14 +7,7 @@ namespace mnswpr
         public int Mines { get; init; }
 
         // Coordinate-indexable array
-        private Utility.TileMatrix BoardTiles { get; init; }
-
-        // Return BoardTiles values
-        public Tile this[Utility.Coordinates coords]
-        {
-            get => BoardTiles[coords];
-            set => BoardTiles[coords] = value;
-        }
+        public Utility.TileMatrix BoardTiles { get; init; }
 
         public Board(int width, int height, int mines)
         {
@@ -38,10 +31,10 @@ namespace mnswpr
                 // Bound checking
                 if (IsAdjacent(relCoords, relCoords + offsetCoordinates))
                 {
-                    Console.WriteLine($"\n@@GetAdjacentCoordinates ----- ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}");
+                    // Console.WriteLine($"\n@@GetAdjacentCoordinates ----- ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}");
                     yield return relCoords + offsetCoordinates;
                 }
-                else { Console.WriteLine($"\n@@GetAdjacentCoordinates ----- NOT ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}"); }
+                // else { Console.WriteLine($"\n@@GetAdjacentCoordinates ----- NOT ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}"); }
             }
         }
 
@@ -58,29 +51,19 @@ namespace mnswpr
                 do { mineCoords = new(rand.Next(Width), rand.Next(Height)); }
                 while (pickedCoordinates.Contains(mineCoords) || IsAdjacent(mineCoords, clickCoords));
 
-                Console.WriteLine("\n@@GenerateMines ----- NEW MINE COORDS: " + mineCoords);
-
-                BoardTiles[mineCoords].IsMine = true;
-
-                // Increment all adjacent tiles mine counts
                 foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(mineCoords))
                     BoardTiles[adjacentCoords].AdjacentMines++;
+
+                // Console.WriteLine("\n@@GenerateMines ----- NEW MINE COORDS: " + mineCoords);
+
+                BoardTiles[mineCoords].IsMine = true;
             }
-        }
-
-        // Returns number of neighboring mines relative to coords
-        public int CountAdjacent(Utility.Coordinates coords, Tile.TileState tileState)
-        {
-            int stateCount = 0;
-            foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
-                if (BoardTiles[adjacentCoords].CurrentState == tileState) stateCount++;
-
-            return stateCount;
         }
 
         // Reveal all neighboring blank tiles recursively TODO: rewrite using coordinates if possible
         public void Flood(Utility.Coordinates coords, List<Utility.Coordinates>? visited = null, Queue<Utility.Coordinates>? queue = null)
         {
+            Console.WriteLine("\n@@Flood ------ Doing " + coords);
             Tile coordsTile = BoardTiles[coords];
 
             // Init on first iteration
@@ -116,7 +99,7 @@ namespace mnswpr
         {
             foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
             {
-                if (BoardTiles[coords].CurrentState == Tile.TileState.Unknown) Flood(coords);
+                if (BoardTiles[adjacentCoords].CurrentState == Tile.TileState.Unknown) Flood(coords);
             }
         }
 
@@ -159,8 +142,7 @@ namespace mnswpr
         // Returns whether targCoords is adjacent to relCoords
         private bool IsAdjacent(Utility.Coordinates relCoords, Utility.Coordinates targCoords)
         {
-
-            Console.WriteLine($"\n@@IsAdjacent ----------- Checking {relCoords} and {targCoords}");
+            // Console.WriteLine($"\n@@IsAdjacent ----------- Checking {relCoords} and {targCoords}");
             // Bounds checking
             if (targCoords.X < 0 || targCoords.X >= Width
              || targCoords.Y < 0 || targCoords.Y >= Height) return false;
@@ -169,7 +151,7 @@ namespace mnswpr
             if (Math.Abs(relCoords.X - targCoords.X) > 1
              || Math.Abs(relCoords.Y - targCoords.Y) > 1) return false;
 
-            Console.WriteLine("ADJACENT ------------");
+            // Console.WriteLine("ADJACENT ------------");
 
             return true;
         }
@@ -179,13 +161,21 @@ namespace mnswpr
             return IsAdjacent(IndToCoords(relInd), IndToCoords(targInd));
         }
 
+        // Returns number of adjacent cells that satisfy comparison. Very overkill, but I get to use Func<>
+        public int CountAdjacent(Utility.Coordinates coords, Tile.TileState filterState)
+        {
+            int count = 0;
+            foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
+                if (BoardTiles[adjacentCoords].CurrentState == filterState) count++;
+
+            return count;
+        }
+
         // Sets all tiles with a mine to TileState.Exploded
         public void ExplodeMines()
         {
             foreach (Tile boardTile in BoardTiles)
-            {
                 if (boardTile.IsMine) boardTile.CurrentState = Tile.TileState.Exploded;
-            }
         }
 
         // Returns (row, col) coordinates for ind
@@ -212,12 +202,11 @@ namespace mnswpr
         {
             Tile tile = BoardTiles[coords];
 
-            // Pretty code courtesy of Claude :3 (C#8 switch expressions, could otherwise use a normal switch or conditional)
             tile.CurrentState = tile.CurrentState switch
             {
-                Tile.TileState.Unknown => Tile.TileState.Flagged,
                 Tile.TileState.Flagged => Tile.TileState.Unknown,
-                var other => other
+                Tile.TileState.Unknown => Tile.TileState.Flagged,
+                var other              => other
             };
         }
     }
