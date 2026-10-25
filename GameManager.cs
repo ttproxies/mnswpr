@@ -53,7 +53,8 @@ namespace mnswpr
             {
                 case Utility.PlayerAction.Flag:
                     _board.ToggleFlag(_actionCoords);
-                    _flagCoords.Add(_actionCoords);
+                    // Toggle flag: .Remove and .Add automatically perform lookup
+                    if (!_flagCoords.Remove(_actionCoords)) _flagCoords.Add(_actionCoords);
                     break;
 
                 case Utility.PlayerAction.Reveal:
@@ -62,7 +63,7 @@ namespace mnswpr
                         _board.GenerateMines(_actionCoords);
                         State = GameState.Playing;
 
-                    if (actionTile.IsMine)
+                    if (!_flagCoords.Contains(_actionCoords) && actionTile.IsMine)
                     {
                         Playing = false;
                         State = GameState.Exploded;
