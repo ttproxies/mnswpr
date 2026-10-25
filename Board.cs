@@ -37,8 +37,10 @@ namespace mnswpr
             {
                 // Bound checking
                 if (IsAdjacent(relCoords, relCoords + offsetCoordinates))
-                    {Console.WriteLine($"\n@@GetAdjacentCoordinates ----- ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}");
-                    yield return relCoords + offsetCoordinates;}
+                {
+                    Console.WriteLine($"\n@@GetAdjacentCoordinates ----- ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}");
+                    yield return relCoords + offsetCoordinates;
+                }
                 else { Console.WriteLine($"\n@@GetAdjacentCoordinates ----- NOT ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}"); }
             }
         }
@@ -102,12 +104,12 @@ namespace mnswpr
                 }
             }
 
-            // Return if nothing left in queue
-            if (queue.Count == 0) return;
-
-            // Otherwise, go to next tile in queue
-            Utility.Coordinates nextCoords = queue.Dequeue();
-            Flood(nextCoords, visited, queue);
+            // Pick out tiles until none is left in queue
+            while (queue.Count != 0)
+            {
+                Utility.Coordinates nextCoords = queue.Dequeue();
+                Flood(nextCoords, visited, queue);
+            }
         }
 
         public void Chord(Utility.Coordinates coords)
@@ -164,8 +166,8 @@ namespace mnswpr
              || targCoords.Y < 0 || targCoords.Y >= Height) return false;
 
             // Adjacency
-            if (Math.Abs(relCoords.X - targCoords.X) != 1
-             || Math.Abs(relCoords.Y - targCoords.Y) != 1) return false;
+            if (Math.Abs(relCoords.X - targCoords.X) > 1
+             || Math.Abs(relCoords.Y - targCoords.Y) > 1) return false;
 
             Console.WriteLine("ADJACENT ------------");
 
@@ -194,12 +196,12 @@ namespace mnswpr
         }
 
         public void RevealTile(Utility.Coordinates coords)
-        {   
+        {
             Tile tile = BoardTiles[coords];
             tile.CurrentState = tile.CurrentState switch
             {
                 Tile.TileState.Unknown => tile.IsMine ? Tile.TileState.Exploded : Tile.TileState.Revealed,
-                var other              => other
+                var other => other
             };
 
             Console.WriteLine($"\n@@RevealTile ----- DID {coords} -> {tile.CurrentState}");
@@ -215,7 +217,7 @@ namespace mnswpr
             {
                 Tile.TileState.Unknown => Tile.TileState.Flagged,
                 Tile.TileState.Flagged => Tile.TileState.Unknown,
-                var other              => other
+                var other => other
             };
         }
     }
