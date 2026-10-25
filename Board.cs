@@ -37,7 +37,9 @@ namespace mnswpr
             {
                 // Bound checking
                 if (IsAdjacent(relCoords, relCoords + offsetCoordinates))
-                    yield return relCoords + offsetCoordinates;
+                    {Console.WriteLine($"\n@@GetAdjacentCoordinates ----- ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}");
+                    yield return relCoords + offsetCoordinates;}
+                else { Console.WriteLine($"\n@@GetAdjacentCoordinates ----- NOT ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}"); }
             }
         }
 
@@ -53,6 +55,8 @@ namespace mnswpr
                 // Choose a random index to place the mine
                 do { mineCoords = new(rand.Next(Width), rand.Next(Height)); }
                 while (pickedCoordinates.Contains(mineCoords) || IsAdjacent(mineCoords, clickCoords));
+
+                Console.WriteLine("\n@@GenerateMines ----- NEW MINE COORDS: " + mineCoords);
 
                 BoardTiles[mineCoords].IsMine = true;
 
@@ -93,6 +97,7 @@ namespace mnswpr
                  && !queue.Contains(adjacentCoords)
                  && IsAdjacent(coords, adjacentCoords))
                 {
+                    Console.WriteLine($"\n@@Flood ----- Enqueued {adjacentCoords}");
                     queue.Enqueue(adjacentCoords);
                 }
             }
@@ -152,6 +157,8 @@ namespace mnswpr
         // Returns whether targCoords is adjacent to relCoords
         private bool IsAdjacent(Utility.Coordinates relCoords, Utility.Coordinates targCoords)
         {
+
+            Console.WriteLine($"\n@@IsAdjacent ----------- Checking {relCoords} and {targCoords}");
             // Bounds checking
             if (targCoords.X < 0 || targCoords.X >= Width
              || targCoords.Y < 0 || targCoords.Y >= Height) return false;
@@ -159,6 +166,8 @@ namespace mnswpr
             // Adjacency
             if (Math.Abs(relCoords.X - targCoords.X) != 1
              || Math.Abs(relCoords.Y - targCoords.Y) != 1) return false;
+
+            Console.WriteLine("ADJACENT ------------");
 
             return true;
         }
@@ -180,6 +189,7 @@ namespace mnswpr
         // Returns (row, col) coordinates for ind
         public Utility.Coordinates IndToCoords(int ind)
         {
+            Console.WriteLine("\n@@IndToCoords ----- CONVERTED INDEX: " + Convert.ToString(ind), new Utility.Coordinates(ind / Width, ind % Width));
             return new((int)(ind / Width), ind % Width);
         }
 
@@ -192,7 +202,7 @@ namespace mnswpr
                 var other              => other
             };
 
-            Console.WriteLine($"{coords} -> {tile.CurrentState}");
+            Console.WriteLine($"\n@@RevealTile ----- DID {coords} -> {tile.CurrentState}");
         }
 
         // Toggles a tile between flagged and unknown state

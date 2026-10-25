@@ -42,7 +42,7 @@ namespace mnswpr
 
             string[] inputParams = inputAction.Split();
 
-            (_actionType, _actionCoords) = (Utility.ACTION_CHAR_TO_ENUM[Convert.ToChar(inputParams[0])], new(Convert.ToInt32(inputParams[1]), Convert.ToInt32(inputParams[2])));
+            (_actionType, _actionCoords) = (Utility.ACTION_CHAR_TO_ENUM[Convert.ToChar(inputParams[0])], new(Convert.ToInt32(inputParams[1])-1, Convert.ToInt32(inputParams[2])-1));
         }
     
         // TODO: make more elegant
@@ -73,7 +73,7 @@ namespace mnswpr
 
                 case Utility.PlayerAction.Chord:
                     // Think about ways to make more elegant
-                    if (actionTile.AdjacentFlags == actionTile.AdjacentMines)
+                    if (actionTile.AdjacentFlags > actionTile.AdjacentMines)
                         _board.Chord(_actionCoords);
 
                     if (_board.CountAdjacent(_actionCoords, Tile.TileState.Exploded) != 0)

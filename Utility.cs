@@ -40,13 +40,16 @@ namespace mnswpr
         }
 
         public static readonly Coordinates[] ADJACENT_COORD_OFFSETS = [
+            // Above
             new Coordinates(-1, -1),
             new Coordinates(0, -1),
             new Coordinates(1, -1),
 
+            // Sides
             new Coordinates(-1, 0),
             new Coordinates(1, 0),
 
+            // Below
             new Coordinates(-1, 1),
             new Coordinates(0, 1),
             new Coordinates(1, 1),
@@ -77,7 +80,7 @@ namespace mnswpr
             char actionType = Convert.ToChar(actionParams[0]);
             int[] actionCoords;
 
-            try { actionCoords = [Convert.ToInt32(actionParams[1]), Convert.ToInt32(actionParams[2])];}
+            try { actionCoords = [Convert.ToInt32(actionParams[1])-1, Convert.ToInt32(actionParams[2])-1];}
             catch (Exception) {return false;}
 
             if (!ACTION_CHAR_TO_ENUM.ContainsKey(actionType)) return false;
