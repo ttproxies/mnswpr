@@ -1,15 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace mnswpr
 {
     class GameManager(int boardWidth, int boardHeight, int mines)
-    { 
+    {
         // Properties
         public bool Playing { get; set; } = true;
         public GameState State { get; set; } = GameState.Idling;
-        
+
         // Fields
         private readonly List<Utility.Coordinates> _flagCoords = [];
         private Utility.Coordinates _actionCoords;
         private Utility.PlayerAction _actionType;
+        private int _flaggedMines = 0;
 
         // Constructor
         private readonly int _boardWidth = boardWidth;
@@ -42,7 +45,7 @@ namespace mnswpr
 
             string[] inputParams = inputAction.Split();
 
-            (_actionType, _actionCoords) = 
+            (_actionType, _actionCoords) =
             (
                 // Action type
                 Utility.ACTION_CHAR_TO_ENUM
@@ -50,14 +53,14 @@ namespace mnswpr
                     Convert.ToChar(inputParams[0])
                 ],
                 // Coordinates
-                new 
+                new
                 (
                     Convert.ToInt32(inputParams[1]) - 1,
                     Convert.ToInt32(inputParams[2]) - 1
                 )
             );
         }
-    
+
         // TODO: make more elegant
         public void HandleAction()
         {
@@ -67,14 +70,22 @@ namespace mnswpr
                 case Utility.PlayerAction.Flag:
                     _board.ToggleFlag(_actionCoords);
                     // Toggle flag: .Remove and .Add automatically perform lookup
-                    if (!_flagCoords.Remove(_actionCoords)) _flagCoords.Add(_actionCoords);
+                    if (!_flagCoords.Remove(_actionCoords))
+                    {
+                        _flagCoords.Add(_actionCoords);
+                        if (actionTile.IsMine) _flaggedMines++;
+                    }
+                    else if (actionTile.IsMine) _flaggedMines--;
+
+                    if (_flaggedMines == _mines) State = GameState.Completed;
+
                     break;
 
                 case Utility.PlayerAction.Reveal:
                     // Transition to next game state if idling TODO: make more elegant
                     if (State == GameState.Idling)
                         _board.GenerateMines(_actionCoords);
-                        State = GameState.Playing;
+                    State = GameState.Playing;
 
                     if (!_flagCoords.Contains(_actionCoords) && actionTile.IsMine)
                     {
@@ -82,7 +93,7 @@ namespace mnswpr
                         State = GameState.Exploded;
                     }
                     else _board.Flood(_actionCoords);
-                    
+
                     break;
 
                 case Utility.PlayerAction.Chord:
@@ -99,14 +110,11 @@ namespace mnswpr
                     break;
             }
         }
-    
+
         // Determines whether game can continue
         public void GameStatusCheck()
         {
-            if (State == GameState.Exploded)
-                Playing = false;
-        
-            if (State == GameState.Completed) Playing = false;
+
         }
     }
 }

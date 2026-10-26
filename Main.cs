@@ -14,8 +14,11 @@
 
             while (gameManager.Playing)
             {
+                
+                if (gameManager.State == GameManager.GameState.Completed
+                 || gameManager.State == GameManager.GameState.Exploded) gameManager.Playing = false;
+                 
                 gameManager.DisplayBoard();
-                gameManager.GameStatusCheck();
                                 
                 switch (gameManager.State)
                 {
