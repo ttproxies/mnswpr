@@ -30,10 +30,8 @@ namespace mnswpr
             {
                 // Bound checking
                 if (IsAdjacent(relCoords, relCoords + offsetCoordinates))
-                {
                     // Console.WriteLine($"\n@@GetAdjacentCoordinates ----- ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}");
                     yield return relCoords + offsetCoordinates;
-                }
                 // else { Console.WriteLine($"\n@@GetAdjacentCoordinates ----- NOT ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}"); }
             }
         }
@@ -65,7 +63,7 @@ namespace mnswpr
         // Reveal all neighboring blank tiles recursively TODO: rewrite using coordinates if possible
         public void Flood(Utility.Coordinates coords, List<Utility.Coordinates>? visited = null, Queue<Utility.Coordinates>? queue = null)
         {
-            // Console.WriteLine("\n@@Flood ------ Doing " + coords);
+            Console.WriteLine("\n@@Flood ------ Doing " + coords);
             Tile coordsTile = BoardTiles[coords];
 
             // Init on first iteration
@@ -100,9 +98,11 @@ namespace mnswpr
         public void Chord(Utility.Coordinates coords)
         {
             foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
-            {
-                if (BoardTiles[adjacentCoords].CurrentState == Tile.TileState.Unknown) Flood(coords);
-            }
+                if (BoardTiles[adjacentCoords].CurrentState == Tile.TileState.Unknown)
+                {
+                    // Console.WriteLine("\n@@Chord ------ Going to " + adjacentCoords);
+                    Flood(adjacentCoords);
+                }
         }
 
         // Displays the current state of the board
@@ -154,7 +154,6 @@ namespace mnswpr
              || Math.Abs(relCoords.Y - targCoords.Y) > 1) return false;
 
             // Console.WriteLine("ADJACENT ------------");
-
             return true;
         }
 
@@ -170,22 +169,20 @@ namespace mnswpr
             foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
                 if (BoardTiles[adjacentCoords].CurrentState == filterState) count++;
 
+            // Console.WriteLine($"\n@@CountAdjacent ------ doing {coords} for {filterState} got: {count}");
             return count;
         }
 
         // Sets all tiles with a mine to TileState.Exploded
         public void ExplodeMines()
         {
+            // Console.WriteLine($"\n@@ExplodeMines ------ exploding mines");
             foreach (Tile boardTile in BoardTiles)
                 if (boardTile.IsMine) boardTile.CurrentState = Tile.TileState.Exploded;
         }
 
         // Returns (row, col) coordinates for ind
-        public Utility.Coordinates IndToCoords(int ind)
-        {
-            // Console.WriteLine("\n@@IndToCoords ----- CONVERTED INDEX: " + Convert.ToString(ind), new Utility.Coordinates(ind / Width, ind % Width));
-            return new((int)(ind / Width), ind % Width);
-        }
+        public Utility.Coordinates IndToCoords(int ind) => new((int)(ind / Width), ind % Width);
 
         public void RevealTile(Utility.Coordinates coords)
         {
@@ -208,7 +205,7 @@ namespace mnswpr
             {
                 Tile.TileState.Flagged => Tile.TileState.Unknown,
                 Tile.TileState.Unknown => Tile.TileState.Flagged,
-                var other              => other
+                var other => other
             };
         }
     }

@@ -91,8 +91,10 @@ namespace mnswpr
                         _board.Chord(_actionCoords);
 
                     if (_board.CountAdjacent(_actionCoords, Tile.TileState.Exploded) > 0)
+                    {
                         _board.ExplodeMines();
                         State = GameState.Exploded;
+                    }
 
                     break;
             }
