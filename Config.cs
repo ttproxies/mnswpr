@@ -1,0 +1,7 @@
+namespace mnswpr
+{
+    class Config
+    {
+        
+    }
+}

@@ -1,8 +1,6 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace mnswpr
 {
-    class GameManager(int boardWidth, int boardHeight, int mines)
+    class GameManager(BoardPreset preset)
     {
         // Properties
         public bool Playing { get; set; } = true;
@@ -15,10 +13,10 @@ namespace mnswpr
         private int _flaggedMines = 0;
 
         // Constructor
-        private readonly int _boardWidth = boardWidth;
-        private readonly int _boardHeight = boardHeight;
-        private readonly int _mines = mines;
-        private readonly Board _board = new(boardWidth, boardHeight, mines);
+        private readonly int _boardWidth = preset.Width;
+        private readonly int _boardHeight = preset.Height;
+        private readonly int _mines = preset.Mines;
+        private readonly Board _board = new(preset.Width, preset.Height, preset.Mines);
 
         public enum GameState
         {
