@@ -42,13 +42,18 @@ namespace mnswpr
 
             string[] inputParams = inputAction.Split();
 
-            (_actionType, _actionCoords) =  (
+            (_actionType, _actionCoords) = 
+            (
                 // Action type
-                Utility.ACTION_CHAR_TO_ENUM[Convert.ToChar(inputParams[0])],
+                Utility.ACTION_CHAR_TO_ENUM
+                [
+                    Convert.ToChar(inputParams[0])
+                ],
                 // Coordinates
-                new(
-                    Convert.ToInt32(inputParams[1])-1,
-                    Convert.ToInt32(inputParams[2])-1
+                new 
+                (
+                    Convert.ToInt32(inputParams[1]) - 1,
+                    Convert.ToInt32(inputParams[2]) - 1
                 )
             );
         }
@@ -73,7 +78,7 @@ namespace mnswpr
 
                     if (!_flagCoords.Contains(_actionCoords) && actionTile.IsMine)
                     {
-                        Playing = false;
+                        _board.ExplodeMines();
                         State = GameState.Exploded;
                     }
                     else _board.Flood(_actionCoords);
@@ -85,7 +90,8 @@ namespace mnswpr
                     if (_board.CountAdjacent(_actionCoords, Tile.TileState.Flagged) >= actionTile.AdjacentMines)
                         _board.Chord(_actionCoords);
 
-                    if (_board.CountAdjacent(_actionCoords, Tile.TileState.Exploded) != 0)
+                    if (_board.CountAdjacent(_actionCoords, Tile.TileState.Exploded) > 0)
+                        _board.ExplodeMines();
                         State = GameState.Exploded;
 
                     break;
@@ -95,9 +101,9 @@ namespace mnswpr
         // Determines whether game can continue
         public void GameStatusCheck()
         {
-            if (State == GameState.Exploded) Playing = false;
-                _board.ExplodeMines();
-
+            if (State == GameState.Exploded)
+                Playing = false;
+        
             if (State == GameState.Completed) Playing = false;
         }
     }

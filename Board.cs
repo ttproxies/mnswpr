@@ -19,7 +19,7 @@ namespace mnswpr
                 for (int y = 0; y < height; y++)
                 {
                     Utility.Coordinates iterCoords = new(x, y);
-                    BoardTiles[iterCoords] = new Tile(iterCoords);
+                    BoardTiles[iterCoords] = new(iterCoords);
                 }
             }
         }
@@ -51,6 +51,8 @@ namespace mnswpr
                 do { mineCoords = new(rand.Next(Width), rand.Next(Height)); }
                 while (pickedCoordinates.Contains(mineCoords) || IsAdjacent(mineCoords, clickCoords));
 
+                pickedCoordinates[i] = mineCoords;
+
                 foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(mineCoords))
                     BoardTiles[adjacentCoords].AdjacentMines++;
 
@@ -63,7 +65,7 @@ namespace mnswpr
         // Reveal all neighboring blank tiles recursively TODO: rewrite using coordinates if possible
         public void Flood(Utility.Coordinates coords, List<Utility.Coordinates>? visited = null, Queue<Utility.Coordinates>? queue = null)
         {
-            Console.WriteLine("\n@@Flood ------ Doing " + coords);
+            // Console.WriteLine("\n@@Flood ------ Doing " + coords);
             Tile coordsTile = BoardTiles[coords];
 
             // Init on first iteration
@@ -82,7 +84,7 @@ namespace mnswpr
                  && !queue.Contains(adjacentCoords)
                  && IsAdjacent(coords, adjacentCoords))
                 {
-                    Console.WriteLine($"\n@@Flood ----- Enqueued {adjacentCoords}");
+                    // Console.WriteLine($"\n@@Flood ----- Enqueued {adjacentCoords}");
                     queue.Enqueue(adjacentCoords);
                 }
             }
@@ -181,7 +183,7 @@ namespace mnswpr
         // Returns (row, col) coordinates for ind
         public Utility.Coordinates IndToCoords(int ind)
         {
-            Console.WriteLine("\n@@IndToCoords ----- CONVERTED INDEX: " + Convert.ToString(ind), new Utility.Coordinates(ind / Width, ind % Width));
+            // Console.WriteLine("\n@@IndToCoords ----- CONVERTED INDEX: " + Convert.ToString(ind), new Utility.Coordinates(ind / Width, ind % Width));
             return new((int)(ind / Width), ind % Width);
         }
 
@@ -194,7 +196,7 @@ namespace mnswpr
                 var other => other
             };
 
-            Console.WriteLine($"\n@@RevealTile ----- DID {coords} -> {tile.CurrentState}");
+            // Console.WriteLine($"\n@@RevealTile ----- DID {coords} -> {tile.CurrentState}");
         }
 
         // Toggles a tile between flagged and unknown state

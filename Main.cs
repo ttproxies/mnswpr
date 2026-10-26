@@ -4,6 +4,8 @@
     {
         public static int Main(string[] args)
         {
+            if (!IsValidGameArgs(args)) return 1;
+
             int gameBoardWidth = int.Parse(args[0]);
             int gameBoardHeight = int.Parse(args[1]);
             int gameBoardMines = int.Parse(args[2]);
@@ -27,7 +29,7 @@
             return 0;
         }
 
-        private bool IsValidGameArgs(string[] args)
+        private static bool IsValidGameArgs(string[] args)
         {
             return true;
         }
