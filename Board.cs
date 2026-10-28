@@ -30,10 +30,7 @@ namespace mnswpr
             {
                 // Bound checking
                 if (IsAdjacent(relCoords, relCoords + offsetCoordinates))
-                    // Console.WriteLine($"\n@@GetAdjacentCoordinates ----- ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}");
-                    yield return relCoords + offsetCoordinates;
-                // else { Console.WriteLine($"\n@@GetAdjacentCoordinates ----- NOT ADJACENT: {relCoords} >< {relCoords + offsetCoordinates}"); }
-            }
+                    yield return relCoords + offsetCoordinates;            }
         }
 
         // Distibutes mines across the board and sets boardMines accordingly
@@ -54,8 +51,6 @@ namespace mnswpr
                 foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(mineCoords))
                     BoardTiles[adjacentCoords].AdjacentMines++;
 
-                // Console.WriteLine("\n@@GenerateMines ----- NEW MINE COORDS: " + mineCoords);
-
                 BoardTiles[mineCoords].IsMine = true;
             }
         }
@@ -63,7 +58,6 @@ namespace mnswpr
         // Reveal all neighboring blank tiles recursively TODO: rewrite using coordinates if possible
         public void Flood(Utility.Coordinates coords, List<Utility.Coordinates>? visited = null, Queue<Utility.Coordinates>? queue = null)
         {
-            Console.WriteLine("\n@@Flood ------ Doing " + coords);
             Tile coordsTile = BoardTiles[coords];
 
             // Init on first iteration
@@ -82,7 +76,6 @@ namespace mnswpr
                  && !queue.Contains(adjacentCoords)
                  && IsAdjacent(coords, adjacentCoords))
                 {
-                    // Console.WriteLine($"\n@@Flood ----- Enqueued {adjacentCoords}");
                     queue.Enqueue(adjacentCoords);
                 }
             }
@@ -100,7 +93,6 @@ namespace mnswpr
             foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
                 if (BoardTiles[adjacentCoords].CurrentState == Tile.TileState.Unknown)
                 {
-                    // Console.WriteLine("\n@@Chord ------ Going to " + adjacentCoords);
                     Flood(adjacentCoords);
                 }
         }
@@ -108,33 +100,18 @@ namespace mnswpr
         // Displays the current state of the board
         public void DisplayBoard()
         {
-            Console.WriteLine("\x1b[2J");
-            Console.Clear();
-
+            Console.WriteLine();
             for (int y = 0; y < Height; y++)
             {
                 for (int x = 0; x < Width; x++)
                 {
                     Tile boardTile = BoardTiles[new(x, y)];
 
-                    switch (boardTile.CurrentState)
-                    {
-                        case Tile.TileState.Unknown:
-                            Console.Write("◩ ");
-                            break;
+                    if (boardTile.CurrentState == Tile.TileState.Revealed && boardTile.AdjacentMines > 0)
+                        Console.Write(boardTile.AdjacentMines);
+                    else Console.Write(Config.TILE_ICONS[boardTile.CurrentState]);
 
-                        case Tile.TileState.Revealed:
-                            Console.Write(boardTile.AdjacentMines > 0 ? boardTile.AdjacentMines + " " : "⚬ ");
-                            break;
-
-                        case Tile.TileState.Flagged:
-                            Console.Write("⚐ ");
-                            break;
-
-                        case Tile.TileState.Exploded:
-                            Console.Write("✴︎ ");
-                            break;
-                    }
+                    Console.Write(" ");
                 }
 
                 Console.WriteLine();
@@ -144,7 +121,6 @@ namespace mnswpr
         // Returns whether targCoords is adjacent to relCoords
         private bool IsAdjacent(Utility.Coordinates relCoords, Utility.Coordinates targCoords)
         {
-            // Console.WriteLine($"\n@@IsAdjacent ----------- Checking {relCoords} and {targCoords}");
             // Bounds checking
             if (targCoords.X < 0 || targCoords.X >= Width
              || targCoords.Y < 0 || targCoords.Y >= Height) return false;
@@ -153,7 +129,6 @@ namespace mnswpr
             if (Math.Abs(relCoords.X - targCoords.X) > 1
              || Math.Abs(relCoords.Y - targCoords.Y) > 1) return false;
 
-            // Console.WriteLine("ADJACENT ------------");
             return true;
         }
 
@@ -169,14 +144,12 @@ namespace mnswpr
             foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
                 if (BoardTiles[adjacentCoords].CurrentState == filterState) count++;
 
-            // Console.WriteLine($"\n@@CountAdjacent ------ doing {coords} for {filterState} got: {count}");
             return count;
         }
 
         // Sets all tiles with a mine to TileState.Exploded
         public void ExplodeMines()
         {
-            // Console.WriteLine($"\n@@ExplodeMines ------ exploding mines");
             foreach (Tile boardTile in BoardTiles)
                 if (boardTile.IsMine) boardTile.CurrentState = Tile.TileState.Exploded;
         }
@@ -192,8 +165,6 @@ namespace mnswpr
                 Tile.TileState.Unknown => tile.IsMine ? Tile.TileState.Exploded : Tile.TileState.Revealed,
                 var other => other
             };
-
-            // Console.WriteLine($"\n@@RevealTile ----- DID {coords} -> {tile.CurrentState}");
         }
 
         // Toggles a tile between flagged and unknown state
