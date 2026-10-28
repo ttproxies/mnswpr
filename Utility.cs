@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace mnswpr
@@ -73,14 +72,14 @@ namespace mnswpr
         };
 
         // Queries for user input (Action describes a method -> no ret. value)
-        public static void GetAction(string prompt, string pattern, Action<string?> actionHandler)
+        public static void GetAction(string prompt, string pattern, Action<string> actionHandler)
         {
             Console.Write($"\n{prompt}\n> ");
             string? input = Console.ReadLine();
 
             while (string.IsNullOrEmpty(input) || !Regex.IsMatch(input, pattern))
             {
-                Console.WriteLine("\nInvalid input, please try again\n> ");
+                Console.Write("\nInvalid input, please try again\n> ");
                 input = Console.ReadLine();
             }
 

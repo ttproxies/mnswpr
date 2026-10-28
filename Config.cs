@@ -12,9 +12,18 @@ namespace mnswpr
 
             // Container
             public static readonly IReadOnlyList<BoardPreset> All = [Beginner, Intermediate, Expert, Superhuman];
+
+            // Resolver
+            public static readonly Dictionary<string, BoardPreset> NAME_TO_PRESET = new()
+            {
+                {"Beginner", Beginner},
+                {"Intermediate", Intermediate},
+                {"Expert", Expert},
+                {"Superhuman", Superhuman},
+            };
         }
 
-        public static string GAME_ASCII = """                                           
+        public static string TITLE_ASCII = """                                           
          _ __ ___  _ __  _____      ___ __  _ __ 
         | '_ ` _ \| '_ \/ __\ \ /\ / / '_ \| '__|
         | | | | | | | | \__ \\ V  V /| |_) | |   

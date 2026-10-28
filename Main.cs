@@ -4,8 +4,10 @@
     {
         public static int Main(string[] args)
         {   
+            // Game title
+            Console.WriteLine(Config.TITLE_ASCII);
+            Console.WriteLine(Config.ASCII_BORDER);
 
-            var preset = Config.BoardPreset.Beginner;
             var gameManager = new GameManager();
 
             while (gameManager.Playing)
@@ -18,8 +20,8 @@
                 switch (gameManager.State)
                 {
                     default:
-                        gameManager.GetAction();
-                        gameManager.HandleAction();
+                        gameManager.GetGameInput();
+                        gameManager.PerformUserAction();
                         break;
                 }
             }

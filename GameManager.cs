@@ -8,7 +8,7 @@ namespace mnswpr
 
         // Fields
         private readonly List<Utility.Coordinates> _flagCoords = [];
-        private readonly Config.BoardPreset _activePreset;
+        private Config.BoardPreset _activePreset;
         private Utility.Coordinates _actionCoords;
         private Utility.PlayerAction _actionType;
         private int _flaggedMines = 0;
@@ -18,6 +18,7 @@ namespace mnswpr
         private readonly int _mines;
         private readonly Board _board;
 
+        private readonly string _presetChoicePattern = $@"^(?i)({String.Join('|', Config.BoardPreset.NAME_TO_PRESET.Keys)}|Custom)$";
         private readonly string _gameActionPattern;
 
         public enum GameState
@@ -30,20 +31,31 @@ namespace mnswpr
 
         public GameManager()
         {
-            Console.WriteLine(Config.GAME_ASCII);
-            Console.WriteLine(Config.ASCII_BORDER);
-
-            Console.WriteLine("Welcome. Please choose a board preset to begin: ");
+            // Have the user choose a preset
+            Console.WriteLine("Welcome. Please choose a board preset to begin:\n");
             foreach (Config.BoardPreset preset in Config.BoardPreset.All)
             {
                 Console.WriteLine($"{preset.Name} - {preset.Width}x{preset.Height}, {preset.Mines} mines");
             }
+
+            // Set active preset
+            Utility.GetAction("Preset name", _presetChoicePattern, (presetName) => {
+                 _activePreset = Config.BoardPreset.NAME_TO_PRESET[char.ToUpper(presetName[0]) + presetName[1..]];
+            });
+
+            (_boardWidth, _boardHeight, _mines) = (_activePreset.Width, _activePreset.Height, _activePreset.Mines);
+            _board = new(_boardWidth, _boardHeight, _mines);
+
+            // Set regex patterns to use for checking input
+            _gameActionPattern = $@"^?(i)({String.Join('|', Utility.ACTION_CHAR_TO_ENUM.Keys)})\s[1-{_boardWidth}]\s[1-{_boardHeight}]$";
         }
 
+        // Expose common methods while preserving encapsulation
         public void DisplayBoard() => _board.DisplayBoard();
+        public void GetGameInput() => Utility.GetAction("Action", _gameActionPattern, GameActionHandler);
 
         // Handler for Utility.GetAction
-        public void GameActionHandler(string? inputAction)
+        private void GameActionHandler(string? inputAction)
         {
             while (string.IsNullOrEmpty(inputAction) || !Utility.IsActionValid(inputAction, _boardWidth, _boardHeight))
             {
@@ -56,10 +68,7 @@ namespace mnswpr
             (_actionType, _actionCoords) =
             (
                 // Action type
-                Utility.ACTION_CHAR_TO_ENUM
-                [
-                    Convert.ToChar(inputParams[0])
-                ],
+                Utility.ACTION_CHAR_TO_ENUM[Convert.ToChar(inputParams[0])],
                 // Coordinates
                 new
                 (
@@ -69,8 +78,8 @@ namespace mnswpr
             );
         }
 
-        // TODO: make more elegant
-        public void DoUserAction()
+        // Performs whatever game command was given by user
+        public void PerformUserAction()
         {
             Tile actionTile = _board.BoardTiles[_actionCoords];
             switch (_actionType)
@@ -117,12 +126,6 @@ namespace mnswpr
 
                     break;
             }
-        }
-
-        // Determines whether game can continue
-        public void GameStatusCheck()
-        {
-
         }
     }
 }
