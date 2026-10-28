@@ -23,12 +23,10 @@ namespace mnswpr
             };
         }
 
-        public static string TITLE_ASCII = """                                           
-         _ __ ___  _ __  _____      ___ __  _ __ 
-        | '_ ` _ \| '_ \/ __\ \ /\ / / '_ \| '__|
-        | | | | | | | | \__ \\ V  V /| |_) | |   
-        |_| |_| |_|_| |_|___/ \_/\_/ | .__/|_|   
-                                     |_|         
+        public static string TITLE_ASCII = """
+        ┌┬┐┌┐┌┌─┐┬ ┬┌─┐┬─┐
+        ││││││└─┐│││├─┘├┬┘
+        ┴ ┴┘└┘└─┘└┴┘┴  ┴└─                                                
         """;
 
         public static string ASCII_BORDER = """

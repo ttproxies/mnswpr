@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 
 namespace mnswpr
@@ -25,10 +26,7 @@ namespace mnswpr
             }
 
             // Base implementation required by the interface
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         public readonly record struct Coordinates(int CoordX, int CoordY)
@@ -72,18 +70,24 @@ namespace mnswpr
         };
 
         // Queries for user input (Action describes a method -> no ret. value)
-        public static void GetAction(string prompt, string pattern, Action<string> actionHandler)
+        public static void GetAction(string prompt, string pattern, Func<string, bool> actionFilter, Action<string> actionHandler)
         {
             Console.Write($"\n{prompt}\n> ");
             string? input = Console.ReadLine();
 
-            while (string.IsNullOrEmpty(input) || !Regex.IsMatch(input, pattern))
+            while (string.IsNullOrEmpty(input) || !Regex.IsMatch(input, pattern) || !actionFilter(input))
             {
-                Console.Write("\nInvalid input, please try again\n> ");
+                Console.Write($"\nInvalid input, please try again. {prompt}\n> ");
                 input = Console.ReadLine();
             }
 
             actionHandler(input);
+        }
+
+        // Unwieldy overload for no filter
+        public static void GetAction(string prompt, string pattern, Action<string> actionHandler)
+        {
+            GetAction(prompt, pattern, prompt => true, actionHandler);
         }
 
         // Perform input checking TODO: write as regex
