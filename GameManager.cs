@@ -20,8 +20,10 @@ namespace mnswpr
         private readonly int _mines;
         private readonly Board _board;
 
+        // Input validation
+        private readonly string _gameActionPattern = $@"^(?i)({string.Join('|', Utility.ACTION_CHAR_TO_ENUM.Keys)})\s+([1-9]\d*)\s+([1-9]\d*)$";
         private readonly string _presetChoicePattern = $@"^(?i)({string.Join('|', Config.BoardPreset.NAME_TO_PRESET.Keys)}|Custom)$";
-        private readonly string _gameActionPattern;
+        private readonly string _customPresetPattern = $@"^([1-9]\d*)\s+([1-9]\d*)\s+([1-9]\d*)$";
 
         public enum GameState
         {
@@ -40,53 +42,56 @@ namespace mnswpr
                 Console.WriteLine($"{preset.Name} - {preset.Width}x{preset.Height}, {preset.Mines} mines");
             }
 
-            Console.WriteLine("Additionally, you may define your own preset using the \"Custom\" preset.");
+            Console.WriteLine("Additionally, you may set your attributes using the \"Custom\" preset.");
 
             // Set active preset
-            while (_activePreset == null) Utility.GetAction("Preset name", _presetChoicePattern, PresetSetter);
+            while (_activePreset == null) Utility.GetAction("Preset name", _presetChoicePattern, PresetHandler);
 
             (_boardWidth, _boardHeight, _mines) = (_activePreset.Width, _activePreset.Height, _activePreset.Mines);
             _board = new(_boardWidth, _boardHeight, _mines);
-
-            // Set regex pattern to use for checking input
-            _gameActionPattern = $@"^(?i)({string.Join('|', Utility.ACTION_CHAR_TO_ENUM.Keys)})\s+[1-{_boardWidth}]\s+[1-{_boardHeight}]$";
         }
 
         // Expose common methods while preserving encapsulation
         public void DisplayBoard() => _board.DisplayBoard();
-        public void GetGameInput() => Utility.GetAction("Action", _gameActionPattern, GameActionHandler);
+        public void GetGameInput() => Utility.GetAction("Action", _gameActionPattern, GameActionFilter, GameActionHandler);
 
         // Handle setting board preset 
-        private void PresetSetter(string presetName)
+        private void PresetHandler(string presetName)
         {
             // Ignore input case
             presetName = presetName.ToLower();
             
             if (presetName != "custom")
             {
+                // Set preset to enum value if not custom
                 _activePreset = Config.BoardPreset.NAME_TO_PRESET[char.ToUpper(presetName[0]) + presetName[1..]];
             }
             else
             {
-                string customPresetPattern = $@"^([{1}-{Console.WindowWidth}])\s+([{1}-{Console.WindowWidth}])\s+d+$";
-                Utility.GetAction("Enter board dimensions and mine count", customPresetPattern, (customPreset) =>
+                // Query user for custom board attributes
+                Utility.GetAction("Enter board dimensions and mine count", _customPresetPattern,
+                
+                // Filter
+                (customPreset) =>
                 {
                     // Filter invalid mine count
-                    string[] presetArgs = Regex.Split(customPreset, @"\s+");
-
+                    string[] presetArgs = Utility.SplitRegex(customPreset);
                     (int presetWidth, int presetHeight, int presetMines) = (
                         Convert.ToInt32(presetArgs[0]),
                         Convert.ToInt32(presetArgs[1]),
                         Convert.ToInt32(presetArgs[2])
                     );
 
+                    if (presetWidth > Console.WindowWidth) return false;
                     if (presetMines > presetWidth * presetHeight - 9) return false;
                     return true;
                 },
+
+                // Handler
                 (customPreset) =>
                 {
                     // Set preset if valid
-                    string[] presetArgs = Regex.Split(customPreset, @"\s+");
+                    string[] presetArgs = Utility.SplitRegex(customPreset);
                     _activePreset = new (
                         "Custom", // Name
                         Convert.ToInt32(presetArgs[0]), // Width
@@ -97,21 +102,25 @@ namespace mnswpr
             }
         }
         
-        // Handle game input
-        private void GameActionHandler(string? inputAction)
+        // Filter game action input
+        private bool GameActionFilter(string action)
         {
-            while (string.IsNullOrEmpty(inputAction) || !Utility.IsActionValid(inputAction, _boardWidth, _boardHeight))
-            {
-                Console.Write("\nInvalid input, please try again:\n> ");
-                inputAction = Console.ReadLine();
-            }
+            string[] actionArgs = Utility.SplitRegex(action);
+            
+            if (Convert.ToInt32(actionArgs[1]) > _boardWidth) return false;
+            if (Convert.ToInt32(actionArgs[2]) > _boardHeight) return false;
 
-            string[] inputParams = inputAction.Split();
+            return true; // Note: regex already disallows unrecognized action types
+        }
 
+        // Handle game input
+        private void GameActionHandler(string inputAction)
+        {
+            string[] inputParams = Utility.SplitRegex(inputAction);
             (_actionType, _actionCoords) =
             (
                 // Action type
-                Utility.ACTION_CHAR_TO_ENUM[Convert.ToChar(inputParams[0])],
+                Utility.ACTION_CHAR_TO_ENUM[Convert.ToChar(inputParams[0].ToUpper())],
                 // Coordinates
                 new
                 (
