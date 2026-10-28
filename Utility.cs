@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace mnswpr
 {
@@ -62,12 +64,28 @@ namespace mnswpr
             Chord
         }
 
+        // Dictionary for resolving action characters to enum values
         public static Dictionary<char, PlayerAction> ACTION_CHAR_TO_ENUM = new()
         {
             { 'R', PlayerAction.Reveal },
             { 'F', PlayerAction.Flag },
             { 'C', PlayerAction.Chord }
         };
+
+        // Queries for user input (Action describes a method -> no ret. value)
+        public static void GetAction(string prompt, string pattern, Action<string?> actionHandler)
+        {
+            Console.Write($"\n{prompt}\n> ");
+            string? input = Console.ReadLine();
+
+            while (string.IsNullOrEmpty(input) || !Regex.IsMatch(input, pattern))
+            {
+                Console.WriteLine("\nInvalid input, please try again\n> ");
+                input = Console.ReadLine();
+            }
+
+            actionHandler(input);
+        }
 
         // Perform input checking TODO: write as regex
         public static bool IsActionValid(string actionStr, int boardWidth, int boardHeight)

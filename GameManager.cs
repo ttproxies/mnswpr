@@ -1,6 +1,6 @@
 namespace mnswpr
 {
-    class GameManager(BoardPreset preset)
+    class GameManager
     {
         // Properties
         public bool Playing { get; set; } = true;
@@ -8,15 +8,17 @@ namespace mnswpr
 
         // Fields
         private readonly List<Utility.Coordinates> _flagCoords = [];
+        private readonly Config.BoardPreset _activePreset;
         private Utility.Coordinates _actionCoords;
         private Utility.PlayerAction _actionType;
         private int _flaggedMines = 0;
 
-        // Constructor
-        private readonly int _boardWidth = preset.Width;
-        private readonly int _boardHeight = preset.Height;
-        private readonly int _mines = preset.Mines;
-        private readonly Board _board = new(preset.Width, preset.Height, preset.Mines);
+        private readonly int _boardWidth;
+        private readonly int _boardHeight;
+        private readonly int _mines;
+        private readonly Board _board;
+
+        private readonly string _gameActionPattern;
 
         public enum GameState
         {
@@ -26,15 +28,23 @@ namespace mnswpr
             Completed // Player has won
         }
 
-        // TODO: make more elegant
+        public GameManager()
+        {
+            Console.WriteLine(Config.GAME_ASCII);
+            Console.WriteLine(Config.ASCII_BORDER);
+
+            Console.WriteLine("Welcome. Please choose a board preset to begin: ");
+            foreach (Config.BoardPreset preset in Config.BoardPreset.All)
+            {
+                Console.WriteLine($"{preset.Name} - {preset.Width}x{preset.Height}, {preset.Mines} mines");
+            }
+        }
+
         public void DisplayBoard() => _board.DisplayBoard();
 
-        // Queries for user input
-        public void GetAction()
+        // Handler for Utility.GetAction
+        public void GameActionHandler(string? inputAction)
         {
-            Console.Write("\nAction:\n> ");
-            string? inputAction = Console.ReadLine();
-
             while (string.IsNullOrEmpty(inputAction) || !Utility.IsActionValid(inputAction, _boardWidth, _boardHeight))
             {
                 Console.Write("\nInvalid input, please try again:\n> ");
@@ -60,7 +70,7 @@ namespace mnswpr
         }
 
         // TODO: make more elegant
-        public void HandleAction()
+        public void DoUserAction()
         {
             Tile actionTile = _board.BoardTiles[_actionCoords];
             switch (_actionType)
