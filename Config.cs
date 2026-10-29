@@ -40,5 +40,18 @@ namespace mnswpr
             {Tile.TileState.Revealed, '.'},
             {Tile.TileState.Unknown, '#'},
         };
+
+        public static readonly Dictionary<Tile.TileState, string> ICON_COLORS = new()
+        {
+            {Tile.TileState.Exploded, "255;0;0"},
+            {Tile.TileState.Flagged, "255;0;0"},
+            {Tile.TileState.Revealed, "128;128;128"},
+            {Tile.TileState.Unknown, "255;255;255"}, 
+        };
+
+        public static string COLOR_PREFIX = "\e[38;2;";
+        public static string COLOR_RESET = "\e[0m";
+        public static string[] NUM_COLORS = ["0;33;255", "0;123;1", "206;0;0", "0;7;134", "129;0;0", "0;110;137", "20;20;20", "130;130;130"];
+
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Drawing;
 using System.Text.RegularExpressions;
 
 namespace mnswpr
@@ -102,5 +103,15 @@ namespace mnswpr
         public static string[] SplitRegex(string input) => Regex.Split(input, @"\s+");
 
         // ---- MISC ----
+
+        public static void PrintTileColor(Tile tile)
+        {
+            if (tile.CurrentState == Tile.TileState.Revealed && tile.AdjacentMines > 0)
+                Console.Write(Config.COLOR_PREFIX + Config.NUM_COLORS[tile.AdjacentMines - 1] + 'm' + tile.AdjacentMines + Config.COLOR_RESET);
+            else
+                Console.Write(Config.COLOR_PREFIX + Config.ICON_COLORS[tile.CurrentState] + 'm' + Config.TILE_ICONS[tile.CurrentState] + Config.COLOR_RESET);
+        }
+
+
     }
 }

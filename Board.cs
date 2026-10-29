@@ -105,11 +105,7 @@ namespace mnswpr
                 for (int x = 0; x < Width; x++)
                 {
                     Tile boardTile = BoardTiles[new(x, y)];
-
-                    if (boardTile.CurrentState == Tile.TileState.Revealed && boardTile.AdjacentMines > 0)
-                        Console.Write(boardTile.AdjacentMines);
-                    else Console.Write(Config.TILE_ICONS[boardTile.CurrentState]);
-
+                    Utility.PrintTileColor(boardTile);
                     Console.Write(" ");
                 }
 
