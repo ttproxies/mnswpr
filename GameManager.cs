@@ -9,10 +9,10 @@ namespace mnswpr
         // Properties
         public bool Playing { get; set; } = true;
         public GameState State { get; set; } = GameState.Idling;
+        public Config.BoardPreset ActivePreset { get; private set; }
 
         // Fields
         private readonly List<Utility.Coordinates> _flagCoords = [];
-        private Config.BoardPreset _activePreset;
         private Utility.Coordinates _actionCoords;
         private Utility.PlayerAction _actionType;
         private int _flaggedMines = 0;
@@ -23,7 +23,6 @@ namespace mnswpr
         private readonly Board _board;
 
         // Input validation
-        
 
         public enum GameState
         {
@@ -33,9 +32,30 @@ namespace mnswpr
             Completed // Player has won
         }
 
+        public GameManager(Config.BoardPreset preset)
+        {
+            (_boardWidth, _boardHeight, _mines) = (preset.Width, preset.Height, preset.Mines);
+            _board = new(_boardWidth, _boardHeight, _mines);
+            ActivePreset = preset;
+        }
+
+        // No preset given
         public GameManager()
         {
             // Have the user choose a preset
+            DisplayPresets();
+
+            // Set active preset
+            while (ActivePreset == null) Utility.GetAction("Preset name", Utility.PRESET_CHOICE_PATTERN, PresetHandler);
+
+            // Want to keep readonly; cannot extract
+            (_boardWidth, _boardHeight, _mines) = (ActivePreset.Width, ActivePreset.Height, ActivePreset.Mines);
+            _board = new(_boardWidth, _boardHeight, _mines);    
+        }
+
+        // Shows all available board presets
+        private static void DisplayPresets()
+        {
             Console.WriteLine("Welcome. Please choose a board preset to begin:\n");
             foreach (Config.BoardPreset preset in Config.BoardPreset.All)
             {
@@ -43,12 +63,6 @@ namespace mnswpr
             }
 
             Console.WriteLine("Additionally, you may set your attributes using the \"Custom\" preset.");
-
-            // Set active preset
-            while (_activePreset == null) Utility.GetAction("Preset name", Utility.PRESET_CHOICE_PATTERN, PresetHandler);
-
-            (_boardWidth, _boardHeight, _mines) = (_activePreset.Width, _activePreset.Height, _activePreset.Mines);
-            _board = new(_boardWidth, _boardHeight, _mines);
         }
 
         // Expose common methods while preserving encapsulation
@@ -60,17 +74,17 @@ namespace mnswpr
         {
             // Ignore input case
             presetName = presetName.ToLower();
-            
+
             if (presetName != "custom")
             {
                 // Set preset to enum value if not custom
-                _activePreset = Config.BoardPreset.NAME_TO_PRESET[char.ToUpper(presetName[0]) + presetName[1..]];
+                ActivePreset = Config.BoardPreset.NAME_TO_PRESET[char.ToUpper(presetName[0]) + presetName[1..]];
             }
             else
             {
                 // Query user for custom board attributes
                 Utility.GetAction("Enter board dimensions and mine count", Utility.CUSTOM_PRESET_PATTERN,
-                
+
                 // Filter
                 (customPreset) =>
                 {
@@ -92,7 +106,7 @@ namespace mnswpr
                 {
                     // Set preset if valid
                     string[] presetArgs = Utility.SplitRegex(customPreset);
-                    _activePreset = new (
+                    ActivePreset = new(
                         "Custom", // Name
                         Convert.ToInt32(presetArgs[0]), // Width
                         Convert.ToInt32(presetArgs[1]), // Height
@@ -101,12 +115,12 @@ namespace mnswpr
                 });
             }
         }
-        
+
         // Filter game action input
         private bool GameActionFilter(string action)
         {
             string[] actionArgs = Utility.SplitRegex(action);
-            
+
             if (Convert.ToInt32(actionArgs[1]) > _boardWidth) return false;
             if (Convert.ToInt32(actionArgs[2]) > _boardHeight) return false;
 
@@ -130,6 +144,7 @@ namespace mnswpr
             );
         }
 
+        // Show game over message
         public void ShowGameOver()
         {
             if (State == GameState.Completed) Console.WriteLine("\nYou win! You've flagged every mine correctly.");

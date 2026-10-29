@@ -3,7 +3,7 @@
     class Game
     {
         public static int Main(string[] args)
-        {   
+        {
             Welcome();
 
             // Init game manager
@@ -15,7 +15,7 @@
                  || gameManager.State == GameManager.GameState.Exploded) gameManager.Playing = false;
 
                 gameManager.DisplayBoard();
-                                
+
                 switch (gameManager.State)
                 {
                     case GameManager.GameState.Exploded or GameManager.GameState.Completed:
@@ -24,7 +24,15 @@
                         // Reinitialize a gameManager if retrying
                         Utility.GetAction("Would you like to try again? [y/n]", Utility.RETRY_PATTERN, (retryInput) =>
                         {
-                            if (retryInput == "y") gameManager = new GameManager();
+                            if (retryInput == "y") Utility.GetAction("Change board preset? [y/n]", Utility.RETRY_PATTERN, (presetChangeInput) =>
+                            {
+                                if (presetChangeInput == "y")
+                                {
+                                    Console.Clear();
+                                    gameManager = new GameManager();
+                                }
+                                else gameManager = new GameManager(gameManager.ActivePreset);
+                            });
                             else Console.WriteLine("Thanks for playing!");
                         });
 
