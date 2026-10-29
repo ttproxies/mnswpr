@@ -58,6 +58,14 @@ namespace mnswpr
 
         // ---- INPUT HANDLING ----
 
+        public static readonly Dictionary<ConsoleKey, Coordinates> SELECTION_MOVE_OFFSETS = new()
+        {
+            { ConsoleKey.LeftArrow, new Coordinates(-1, 0) },
+            { ConsoleKey.UpArrow, new Coordinates(0, -1) },
+            { ConsoleKey.RightArrow, new Coordinates(1, 0) },
+            { ConsoleKey.DownArrow, new Coordinates(0, 1) }
+        };
+
         public enum PlayerAction
         {
             Flag,
@@ -66,11 +74,11 @@ namespace mnswpr
         }
 
         // Dictionary for resolving action characters to enum values
-        public static Dictionary<char, PlayerAction> ACTION_CHAR_TO_ENUM = new()
+        public static Dictionary<ConsoleKey, PlayerAction> ACTION_PRESS_TO_ENUM = new()
         {
-            { 'R', PlayerAction.Reveal },
-            { 'F', PlayerAction.Flag },
-            { 'C', PlayerAction.Chord }
+            { ConsoleKey.R, PlayerAction.Reveal },
+            { ConsoleKey.F, PlayerAction.Flag },
+            { ConsoleKey.C, PlayerAction.Chord }
         };
 
         // Queries for user input (Action describes a method -> no ret. value)
@@ -94,7 +102,6 @@ namespace mnswpr
             GetAction(prompt, pattern, prompt => true, actionHandler);
         }
 
-        public static readonly string GAME_ACTION_PATTERN = $@"^(?i)({string.Join('|', Utility.ACTION_CHAR_TO_ENUM.Keys)})\s+([1-9]\d*)\s+([1-9]\d*)$";
         public static readonly string PRESET_CHOICE_PATTERN = $@"^(?i)({string.Join('|', Config.BoardPreset.NAME_TO_PRESET.Keys)}|Custom)$";
         public static readonly string CUSTOM_PRESET_PATTERN = $@"^([1-9]\d*)\s+([1-9]\d*)\s+([1-9]\d*)$";
         public static readonly string RETRY_PATTERN = @"^(?i)[yn]$";
@@ -112,6 +119,10 @@ namespace mnswpr
                 Console.Write(Config.COLOR_PREFIX + Config.ICON_COLORS[tile.CurrentState] + 'm' + Config.TILE_ICONS[tile.CurrentState] + Config.COLOR_RESET);
         }
 
-
+        public static void UpdateCursorSelection(Coordinates cursorCoords)
+        {
+            for (int x = 0; x < cursorCoords.X; x++)
+                Console.Write(Config.CURSOR_OFFSET_ESCAPES[])
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace mnswpr
 
         // Fields
         private readonly List<Utility.Coordinates> _flagCoords = [];
+        private Utility.Coordinates _selectionCoords = new(0, 0);
         private Utility.Coordinates _actionCoords;
         private Utility.PlayerAction _actionType;
         private int _flaggedMines = 0;
@@ -65,9 +66,32 @@ namespace mnswpr
             Console.WriteLine("Additionally, you may set your attributes using the \"Custom\" preset.");
         }
 
-        // Expose common methods while preserving encapsulation
-        public void DisplayBoard() => _board.DisplayBoard();
-        public void GetGameInput() => Utility.GetAction("Action", Utility.GAME_ACTION_PATTERN, GameActionFilter, GameActionHandler);
+        // Display board and update cursor selection
+        public void DisplayBoard()
+        {
+           _board.DisplayBoard();
+           Utility.UpdateCursorSelection(); 
+        }
+        
+        // Updates board fields based on player input
+        public void GetGameInput()
+        {
+            ConsoleKey pressed;
+            while (!Utility.ACTION_PRESS_TO_ENUM.ContainsKey(pressed = Console.ReadKey().Key))
+                // If selection is being and can be moved, move it
+                if (Utility.SELECTION_MOVE_OFFSETS.TryGetValue(pressed, out Utility.Coordinates moveOffset)
+                 && _board.IsAdjacent(_selectionCoords, _selectionCoords + moveOffset))
+                {
+                    _selectionCoords += moveOffset;
+                    DisplayBoard();
+                }
+
+            // Perform action on selected
+            _actionType = Utility.ACTION_PRESS_TO_ENUM[pressed];
+            _actionCoords = _selectionCoords;
+            DisplayBoard();
+
+        }
 
         // Handle setting board preset 
         private void PresetHandler(string presetName)
@@ -116,33 +140,33 @@ namespace mnswpr
             }
         }
 
-        // Filter game action input
-        private bool GameActionFilter(string action)
-        {
-            string[] actionArgs = Utility.SplitRegex(action);
+        // // Filter game action input
+        // private bool GameActionFilter(string action)
+        // {
+        //     string[] actionArgs = Utility.SplitRegex(action);
 
-            if (Convert.ToInt32(actionArgs[1]) > _boardWidth) return false;
-            if (Convert.ToInt32(actionArgs[2]) > _boardHeight) return false;
+        //     if (Convert.ToInt32(actionArgs[1]) > _boardWidth) return false;
+        //     if (Convert.ToInt32(actionArgs[2]) > _boardHeight) return false;
 
-            return true; // Note: regex already disallows unrecognized action types
-        }
+        //     return true; // Note: regex already disallows unrecognized action types
+        // }
 
-        // Handle game input
-        private void GameActionHandler(string inputAction)
-        {
-            string[] inputParams = Utility.SplitRegex(inputAction);
-            (_actionType, _actionCoords) =
-            (
-                // Action type
-                Utility.ACTION_CHAR_TO_ENUM[Convert.ToChar(inputParams[0].ToUpper())],
-                // Coordinates
-                new
-                (
-                    Convert.ToInt32(inputParams[1]) - 1,
-                    Convert.ToInt32(inputParams[2]) - 1
-                )
-            );
-        }
+        // // Handle game input
+        // private void GameActionHandler(string inputAction)
+        // {
+        //     string[] inputParams = Utility.SplitRegex(inputAction);
+        //     (_actionType, _actionCoords) =
+        //     (
+        //         // Action type
+        //         Utility.ACTION_PRESS_TO_ENUM[Convert.ToChar(inputParams[0].ToUpper())],
+        //         // Coordinates
+        //         new
+        //         (
+        //             Convert.ToInt32(inputParams[1]) - 1,
+        //             Convert.ToInt32(inputParams[2]) - 1
+        //         )
+        //     );
+        // }
 
         // Show game over message
         public void ShowGameOver()

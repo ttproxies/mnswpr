@@ -111,10 +111,13 @@ namespace mnswpr
 
                 Console.WriteLine();
             }
+
+            // Move cursor to top left
+            Console.Write(Config.CURSOR_RESET);
         }
 
         // Returns whether targCoords is adjacent to relCoords
-        private bool IsAdjacent(Utility.Coordinates relCoords, Utility.Coordinates targCoords)
+        public bool IsAdjacent(Utility.Coordinates relCoords, Utility.Coordinates targCoords)
         {
             // Bounds checking
             if (targCoords.X < 0 || targCoords.X >= Width
