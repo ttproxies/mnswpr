@@ -51,7 +51,7 @@ namespace mnswpr
 
             // Want to keep readonly; cannot extract
             (_boardWidth, _boardHeight, _mines) = (ActivePreset.Width, ActivePreset.Height, ActivePreset.Mines);
-            _board = new(_boardWidth, _boardHeight, _mines);    
+            _board = new(_boardWidth, _boardHeight, _mines);
         }
 
         // Shows all available board presets
@@ -69,10 +69,10 @@ namespace mnswpr
         // Display board and update cursor selection
         public void DisplayBoard()
         {
-           _board.DisplayBoard();
-           Utility.UpdateCursorSelection(); 
+            _board.DisplayBoard();
+            Utility.UpdateCursorSelection(_selectionCoords);
         }
-        
+
         // Updates board fields based on player input
         public void GetGameInput()
         {
@@ -139,34 +139,6 @@ namespace mnswpr
                 });
             }
         }
-
-        // // Filter game action input
-        // private bool GameActionFilter(string action)
-        // {
-        //     string[] actionArgs = Utility.SplitRegex(action);
-
-        //     if (Convert.ToInt32(actionArgs[1]) > _boardWidth) return false;
-        //     if (Convert.ToInt32(actionArgs[2]) > _boardHeight) return false;
-
-        //     return true; // Note: regex already disallows unrecognized action types
-        // }
-
-        // // Handle game input
-        // private void GameActionHandler(string inputAction)
-        // {
-        //     string[] inputParams = Utility.SplitRegex(inputAction);
-        //     (_actionType, _actionCoords) =
-        //     (
-        //         // Action type
-        //         Utility.ACTION_PRESS_TO_ENUM[Convert.ToChar(inputParams[0].ToUpper())],
-        //         // Coordinates
-        //         new
-        //         (
-        //             Convert.ToInt32(inputParams[1]) - 1,
-        //             Convert.ToInt32(inputParams[2]) - 1
-        //         )
-        //     );
-        // }
 
         // Show game over message
         public void ShowGameOver()

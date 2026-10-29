@@ -122,7 +122,11 @@ namespace mnswpr
         public static void UpdateCursorSelection(Coordinates cursorCoords)
         {
             for (int x = 0; x < cursorCoords.X; x++)
-                Console.Write(Config.CURSOR_OFFSET_ESCAPES[])
+                Console.Write(Config.CURSOR_OFFSET_ESCAPES[new(1, 0)]);
+
+            for (int y = 0; y < cursorCoords.Y; y++)
+                Console.Write(Config.CURSOR_OFFSET_ESCAPES[new(0, 1)]);
+
         }
     }
 }
