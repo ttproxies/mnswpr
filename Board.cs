@@ -30,7 +30,8 @@ namespace mnswpr
             {
                 // Bound checking
                 if (IsAdjacent(relCoords, relCoords + offsetCoordinates))
-                    yield return relCoords + offsetCoordinates;            }
+                    yield return relCoords + offsetCoordinates;
+            }
         }
 
         // Distibutes mines across the board and sets boardMines accordingly
@@ -92,15 +93,13 @@ namespace mnswpr
         {
             foreach (Utility.Coordinates adjacentCoords in GetAdjacentCoordinates(coords))
                 if (BoardTiles[adjacentCoords].CurrentState == Tile.TileState.Unknown)
-                {
                     Flood(adjacentCoords);
-                }
         }
 
         // Displays the current state of the board
         public void DisplayBoard()
         {
-            Console.WriteLine();
+            Console.Clear();
             for (int y = 0; y < Height; y++)
             {
                 for (int x = 0; x < Width; x++)
@@ -132,10 +131,7 @@ namespace mnswpr
             return true;
         }
 
-        private bool IsAdjacent(int relInd, int targInd)
-        {
-            return IsAdjacent(IndToCoords(relInd), IndToCoords(targInd));
-        }
+        private bool IsAdjacent(int relInd, int targInd) => IsAdjacent(IndToCoords(relInd), IndToCoords(targInd));
 
         // Returns number of adjacent cells that satisfy comparison. Very overkill, but I get to use Func<>
         public int CountAdjacent(Utility.Coordinates coords, Tile.TileState filterState)

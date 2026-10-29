@@ -4,10 +4,9 @@
     {
         public static int Main(string[] args)
         {   
-            // Game title
-            Console.WriteLine(Config.TITLE_ASCII);
-            Console.WriteLine(Config.ASCII_BORDER);
+            Welcome();
 
+            // Init game manager
             var gameManager = new GameManager();
 
             while (gameManager.Playing)
@@ -19,6 +18,18 @@
                                 
                 switch (gameManager.State)
                 {
+                    case GameManager.GameState.Exploded or GameManager.GameState.Completed:
+                        gameManager.ShowGameOver();
+
+                        // Reinitialize a gameManager if retrying
+                        Utility.GetAction("Would you like to try again? [y/n]", Utility.RETRY_PATTERN, (retryInput) =>
+                        {
+                            if (retryInput == "y") gameManager = new GameManager();
+                            else Console.WriteLine("Thanks for playing!");
+                        });
+
+                        break;
+
                     default:
                         gameManager.GetGameInput();
                         gameManager.PerformUserAction();
@@ -27,6 +38,13 @@
             }
 
             return 0;
+        }
+
+        private static void Welcome()
+        {
+            Console.Clear();
+            Console.WriteLine(Config.TITLE_ASCII);
+            Console.WriteLine(Config.ASCII_BORDER);
         }
     }
 }

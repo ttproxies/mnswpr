@@ -1,11 +1,12 @@
 using System.Collections;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 
 namespace mnswpr
 {
     class Utility
     {
+        // ---- UTILITY CLASSES ----
+
         // Defines an IEnumerable indexable with Utility.Coordinates for convenience
         public class TileMatrix(int matrixWidth, int matrixHeight) : IEnumerable<Tile>
         {
@@ -54,6 +55,8 @@ namespace mnswpr
             new Coordinates(1, 1),
         ];
 
+        // ---- INPUT HANDLING ----
+
         public enum PlayerAction
         {
             Flag,
@@ -90,6 +93,14 @@ namespace mnswpr
             GetAction(prompt, pattern, prompt => true, actionHandler);
         }
 
+        public static readonly string GAME_ACTION_PATTERN = $@"^(?i)({string.Join('|', Utility.ACTION_CHAR_TO_ENUM.Keys)})\s+([1-9]\d*)\s+([1-9]\d*)$";
+        public static readonly string PRESET_CHOICE_PATTERN = $@"^(?i)({string.Join('|', Config.BoardPreset.NAME_TO_PRESET.Keys)}|Custom)$";
+        public static readonly string CUSTOM_PRESET_PATTERN = $@"^([1-9]\d*)\s+([1-9]\d*)\s+([1-9]\d*)$";
+        public static readonly string RETRY_PATTERN = @"^(?i)[yn]$";
+
+
         public static string[] SplitRegex(string input) => Regex.Split(input, @"\s+");
+
+        // ---- MISC ----
     }
 }

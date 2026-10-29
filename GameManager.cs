@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Microsoft.VisualBasic.FileIO;
 
 namespace mnswpr
 {
@@ -22,9 +23,7 @@ namespace mnswpr
         private readonly Board _board;
 
         // Input validation
-        private readonly string _gameActionPattern = $@"^(?i)({string.Join('|', Utility.ACTION_CHAR_TO_ENUM.Keys)})\s+([1-9]\d*)\s+([1-9]\d*)$";
-        private readonly string _presetChoicePattern = $@"^(?i)({string.Join('|', Config.BoardPreset.NAME_TO_PRESET.Keys)}|Custom)$";
-        private readonly string _customPresetPattern = $@"^([1-9]\d*)\s+([1-9]\d*)\s+([1-9]\d*)$";
+        
 
         public enum GameState
         {
@@ -46,7 +45,7 @@ namespace mnswpr
             Console.WriteLine("Additionally, you may set your attributes using the \"Custom\" preset.");
 
             // Set active preset
-            while (_activePreset == null) Utility.GetAction("Preset name", _presetChoicePattern, PresetHandler);
+            while (_activePreset == null) Utility.GetAction("Preset name", Utility.PRESET_CHOICE_PATTERN, PresetHandler);
 
             (_boardWidth, _boardHeight, _mines) = (_activePreset.Width, _activePreset.Height, _activePreset.Mines);
             _board = new(_boardWidth, _boardHeight, _mines);
@@ -54,7 +53,7 @@ namespace mnswpr
 
         // Expose common methods while preserving encapsulation
         public void DisplayBoard() => _board.DisplayBoard();
-        public void GetGameInput() => Utility.GetAction("Action", _gameActionPattern, GameActionFilter, GameActionHandler);
+        public void GetGameInput() => Utility.GetAction("Action", Utility.GAME_ACTION_PATTERN, GameActionFilter, GameActionHandler);
 
         // Handle setting board preset 
         private void PresetHandler(string presetName)
@@ -70,7 +69,7 @@ namespace mnswpr
             else
             {
                 // Query user for custom board attributes
-                Utility.GetAction("Enter board dimensions and mine count", _customPresetPattern,
+                Utility.GetAction("Enter board dimensions and mine count", Utility.CUSTOM_PRESET_PATTERN,
                 
                 // Filter
                 (customPreset) =>
@@ -129,6 +128,12 @@ namespace mnswpr
                     Convert.ToInt32(inputParams[2]) - 1
                 )
             );
+        }
+
+        public void ShowGameOver()
+        {
+            if (State == GameState.Completed) Console.WriteLine("\nYou win! You've flagged every mine correctly.");
+            else if (State == GameState.Exploded) Console.WriteLine("\nI'm sorry, you lose.. You've exploded a mine.");
         }
 
         // Performs whatever game command was given by user
