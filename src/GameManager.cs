@@ -107,7 +107,7 @@ namespace mnswpr
             else
             {
                 // Query user for custom board attributes
-                Utility.GetAction("Enter board dimensions and mine count", Utility.CUSTOM_PRESET_PATTERN,
+                Utility.GetAction("Enter board dimensions and mine count [w h m]", Utility.CUSTOM_PRESET_PATTERN,
 
                 // Filter
                 (customPreset) =>
