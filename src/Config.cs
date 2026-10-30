@@ -30,7 +30,7 @@ namespace mnswpr
         """;
 
         public static string ASCII_BORDER = """
-        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        ───────────────────────────────────────────────────────
         """;
 
         public static readonly Dictionary<Tile.TileState, char> TILE_ICONS = new()
