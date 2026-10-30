@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\zmono\\OneDrive\\Asztali gép\\Projektek\\mnswpr\\mnswpr.csproj",
+      "projectUniqueName": "C:\\Users\\zmono\\OneDrive\\Asztali gép\\Projektek\\mnswpr\\mnswpr.csproj",
       "projectName": "mnswpr",
-      "projectPath": "c:\\Users\\zmono\\OneDrive\\Asztali gép\\Projektek\\mnswpr\\mnswpr.csproj",
+      "projectPath": "C:\\Users\\zmono\\OneDrive\\Asztali gép\\Projektek\\mnswpr\\mnswpr.csproj",
       "packagesPath": "C:\\Users\\zmono\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\zmono\\OneDrive\\Asztali gép\\Projektek\\mnswpr\\obj\\",
+      "outputPath": "C:\\Users\\zmono\\OneDrive\\Asztali gép\\Projektek\\mnswpr\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\zmono\\AppData\\Roaming\\NuGet\\NuGet.Config"
