@@ -8,7 +8,7 @@ namespace mnswpr
             public static readonly BoardPreset Beginner = new("Beginner", 9, 9, 10);
             public static readonly BoardPreset Intermediate = new("Intermediate", 16, 16, 40);
             public static readonly BoardPreset Expert = new("Expert", 30, 16, 99);
-            public static readonly BoardPreset Superhuman = new("Superhuman", 50, 50, 500);
+            public static readonly BoardPreset Superhuman = new("Superhuman", 50, 40, 500);
 
             // Container
             public static readonly IReadOnlyList<BoardPreset> All = [Beginner, Intermediate, Expert, Superhuman];
@@ -56,6 +56,8 @@ namespace mnswpr
         };
 
         public static string CURSOR_RESET = "\e[H";
+        public static string CURSOR_SAVE = "\e[s";
+        public static string CURSOR_LOAD = "\e[u";
         public static string COLOR_PREFIX = "\e[38;2;";
         public static string COLOR_RESET = "\e[0m";
         public static string[] NUM_COLORS = ["0;33;255", "0;123;1", "206;0;0", "0;7;134", "129;0;0", "0;110;137", "20;20;20", "130;130;130"];

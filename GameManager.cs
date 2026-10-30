@@ -121,6 +121,7 @@ namespace mnswpr
                     );
 
                     if (presetWidth > Console.WindowWidth) return false;
+                    if (presetHeight > Console.WindowHeight) return false;
                     if (presetMines > presetWidth * presetHeight - 9) return false;
                     return true;
                 },
@@ -143,6 +144,7 @@ namespace mnswpr
         // Show game over message
         public void ShowGameOver()
         {
+            Console.WriteLine(Config.CURSOR_LOAD); // Jump to end
             if (State == GameState.Completed) Console.WriteLine("\nYou win! You've flagged every mine correctly.");
             else if (State == GameState.Exploded) Console.WriteLine("\nI'm sorry, you lose.. You've exploded a mine.");
         }

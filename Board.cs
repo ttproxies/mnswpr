@@ -113,6 +113,7 @@ namespace mnswpr
             }
 
             // Move cursor to top left
+            Console.Write(Config.CURSOR_SAVE);
             Console.Write(Config.CURSOR_RESET);
         }
 
