@@ -120,9 +120,9 @@ namespace mnswpr
                         Convert.ToInt32(presetArgs[2])
                     );
 
-                    if (presetWidth > Console.WindowWidth) return false;
-                    if (presetHeight > Console.WindowHeight) return false;
-                    if (presetMines > presetWidth * presetHeight - 9) return false;
+                    if (presetWidth > Console.WindowWidth) { Console.WriteLine("!! Board width cannot exceed that of the console."); return false; }
+                    if (presetHeight > Console.WindowHeight) { Console.WriteLine("!! Board height cannot exceed that of the console."); return false; }
+                    if (presetMines > presetWidth * presetHeight - 9) { Console.WriteLine("!! Number of mines must be possible "); return false; }
                     return true;
                 },
 
